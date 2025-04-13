@@ -62,8 +62,6 @@ export default {
             createQuiz()
         },
         async editQuiz(formIdToEdit) {
-            Swal.fire("Warning", "This method isn't available for now. Try again later", "warning");
-            /*
             // Retrieve existing quizzes from localStorage
             let quizDetails = localStorage.getItem("quizDetails");
             let parsedQuizDetails = quizDetails ? JSON.parse(quizDetails) : [];
@@ -87,20 +85,30 @@ export default {
             const { value: formValues } = await Swal.fire({
                 title: "Edit Your Quiz",
                 html: `
-            <label for="quizName">Quiz Name:</label>
-            <input id="quizName" class="swal2-input" placeholder="Enter Quiz Name" value="${existingQuiz.name}">
+                <div style="text-align: left; padding: 10px 5px;">
+                    <div style="margin-bottom: 15px;">
+                        <label for="quizName" style="display: block; font-weight: 600; margin-bottom: 5px;">Quiz Name:</label>
+                        <input id="quizName" class="swal2-input" placeholder="Enter Quiz Name" value="${existingQuiz.name}" style="width: 100%; margin: 5px 0;">
+                    </div>
 
-            <label for="formId">Form ID:</label>
-            <input id="formId" class="swal2-input" placeholder="Enter Form ID" value="${existingQuiz.form}" readonly>
+                    <div style="margin-bottom: 15px;">
+                        <label for="formId" style="display: block; font-weight: 600; margin-bottom: 5px;">Form ID:</label>
+                        <input id="formId" class="swal2-input" placeholder="Enter Form ID" value="${existingQuiz.form}" readonly style="width: 100%; margin: 5px 0; background-color: #f8f9fa;">
+                        <small style="color: #6c757d; font-size: 12px;">(Read only)</small>
+                    </div>
 
-            <label for="quizTime">Time Limit (minutes):</label>
-            <input id="quizTime" type="number" class="swal2-input" placeholder="Enter Time in Minutes" value="${existingQuiz.time}">
+                    <div style="margin-bottom: 15px;">
+                        <label for="quizTime" style="display: block; font-weight: 600; margin-bottom: 5px;">Time Limit (minutes):</label>
+                        <input id="quizTime" type="number" class="swal2-input" placeholder="Enter Time in Minutes" value="${existingQuiz.time}" style="width: 100%; margin: 5px 0;">
+                    </div>
 
-            <label for="quizType">Select Type:</label>
-            <select id="quizType" class="swal2-select">
-                <option value="Google Form" ${existingQuiz.type === "Google Form" ? "selected" : ""}>Google Form</option>
-            </select>
-        `,
+                    <div style="margin-bottom: 15px;">
+                        <label for="quizType" style="display: block; font-weight: 600; margin-bottom: 5px;">Select Type:</label>
+                        <select id="quizType" class="swal2-select" style="width: 100%; margin: 5px 0;">
+                        <option value="Google Form" ${existingQuiz.type === "Google Form" ? "selected" : ""}>Google Form</option>
+                        </select>
+                    </div>
+                </div>`,
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonText: "Save",
@@ -131,11 +139,12 @@ export default {
 
                 // Save updated quizzes back to localStorage
                 localStorage.setItem("quizDetails", JSON.stringify(parsedQuizDetails));
+                this.$store.commit('setQuizList', parsedQuizDetails);
+                // now, update the json file.
 
                 // Show success message
                 Swal.fire("Success!", "Quiz details updated!", "success");
             }
-             */
         },
         async deleteQuiz(formIdToDelete, sheetName) {
             this.$store.dispatch('removeQuiz', {

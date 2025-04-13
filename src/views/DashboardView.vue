@@ -17,19 +17,19 @@
                         <thead>
                             <tr>
                                 <th>Quiz name</th>
-                                <th>Default settings</th>
+                                <th>Duration</th>
                                 <th>Details</th>
                                 <th>Sharing & Stats</th>
-                                <th>Pinned</th>
+                                <th>End Date</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="quiz in quizList" :key="quiz.form" @click="getLink(quiz.form, quiz.name, quiz.time)">
                                 <td>{{ quiz.name }}</td>
-                                <td>{{ quiz.time }} min<br>Start at any time</td>
+                                <td>{{ quiz.time }} min<br>{{ quiz.start ?  quiz.start: 'Start at any time'}}</td>
                                 <td>{{ quiz.type }}<br>{{ formatDate(quiz.date) }}</td>
-                                <td>Not shared</td>
-                                <td><i class="bi bi-pin"></i></td>
+                                <td>{{ quiz.sharing ? quiz.sharing : 'Anyone can take test' }}</td>
+                                <td>{{ quiz.end ? quiz.end: 'Take Quiz at any time' }} </td>
                             </tr>
                         </tbody>
                     </table>
