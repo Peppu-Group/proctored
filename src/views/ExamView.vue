@@ -64,12 +64,13 @@ export default {
     name: 'ExamView',
     data() {
         return {
-            loading: true, // Show loading until iframe is ready
+            loading: true, // Show loading until iframe is ready.
+            email: null
         };
     },
     async mounted() {
-        // is it possible to attach form id to timer? so we continue the timing only for accessed quiz.
         // seems when the time is 0, it doesn't refresh
+        await this.verifyToken(); // verify that token is present and return email. wrap this in a if token is available.
         const formId = this.$route.params.id;
         await this.$store.dispatch('initAccessToken');
         try {
@@ -79,31 +80,45 @@ export default {
             if (!isFound) {
                 this.$router.push({ name: 'NotFound' })
             } else {
-                // prompt user to add their email and password.
-                console.log(isFound)
-                // load form and corresponding time.
-                const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
-                const iframe = document.getElementById("examFrame");
+                // store form name
+                this.name = isFound.name
+                try {
+                    const response = await axios.post(`${serverUrl}/check-status`, {
+                        email: this.email,
+                        sheet: this.name,
+                    });
+                    console.log(response.data.status )
+                    if (response.data.status == 'Progress') {
+                        // load form and corresponding time.
+                        const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
+                        const iframe = document.getElementById("examFrame");
 
-                // Save form link
-                localStorage.setItem("examLink", formLink);
-                iframe.src = formLink;
+                        // Save form link
+                        localStorage.setItem("examLink", formLink);
+                        iframe.src = formLink;
 
-                // set Timer
-                localStorage.setItem("currentTime", isFound.time)
+                        // set Timer
+                        localStorage.setItem("currentTime", isFound.time)
 
-                // When the form finishes loading
-                iframe.onload = () => {
-                    this.loading = false;
-                    document.getElementById("exam-container").style.display = "flex";
+                        // When the form finishes loading
+                        iframe.onload = () => {
+                            this.loading = false;
+                            document.getElementById("exam-container").style.display = "flex";
 
-                    // Set start time if not already set
-                    if (!localStorage.getItem("examStartTime")) {
-                        localStorage.setItem("examStartTime", Date.now());
+                            // Set start time if not already set
+                            if (!localStorage.getItem("examStartTime")) {
+                                localStorage.setItem("examStartTime", Date.now());
+                            }
+                            this.startTimer();
+                        };
+                    } else {
+                        console.warn(response.data.message);
+                        return null;
                     }
-
-                    this.startTimer();
-                };
+                } catch (error) {
+                    console.error('Error checking status:', error);
+                    return null;
+                }
             }
         } catch (err) {
             Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
@@ -112,6 +127,7 @@ export default {
     },
     methods: {
         async verifyToken() {
+            let token = this.$route.query.token;
             // get token from route and verify it. if valid, give them access to the exam.
             // log the user into google sheet after veification
             // the token should expire in 2 hours.
@@ -120,17 +136,28 @@ export default {
             // they can't provide double emails, especially if those emails don't appear in the email list.
             // the submitting should return the user's email.
             try {
-                const res = await axios.post('https://proctored.server.peppubuild.com/verify-token', { token });
-
+                const res = await axios.post(`${serverUrl}/verify-token`, { token });
+                console.log(res)
                 if (res.data.valid) {
-                    const email = res.data.email;
+                    this.email = res.data.email;
                     // search google sheet for user email, if not present,log the user into googlesheet
+
                     // else send swal that they've already taken the test
                 } else {
                     // send swal that they're using an expired link and exam can't be found. 
                 }
             } catch (err) {
-
+                console.log(err)
+            }
+        },
+        async updateSheet(name, email) {
+            try {
+                await axios.post(`${serverUrl}/update-sheet`, {
+                    sheet: name,
+                    email: email
+                });
+            } catch (err) {
+                console.log('err occurred')
             }
         },
         startTimer() {
@@ -166,6 +193,11 @@ export default {
                     localStorage.removeItem("currentTime");
                     localStorage.removeItem("examStartTime");
                     localStorage.removeItem("examLink");
+                    try {
+                        this.updateSheet(this.name, this.email)
+                    } catch (err) {
+                        console.log(err)
+                    }
                     this.$router.push('/success')
                 }
             }, 1000);

@@ -38,59 +38,6 @@ function driveAuth(accessToken) {
     return service;
 }
 
-// search for sheetId in Sheet.
-/**
- * Auth is an authorized OAuth2 client with `drive.file` scope.
- * @param {OAuth2Client} auth
- * @param {string} sheetName
- * @param {string} valueToFind
- */
-async function findValueInSheetColumnA(auth, sheetName, valueToFind) {
-    const drive = google.drive({ version: 'v3', auth });
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    // Step 1: Search for a spreadsheet with the given name
-    const fileList = await drive.files.list({
-        q: `name='${sheetName}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed = false`,
-        fields: 'files(id, name)',
-        spaces: 'drive',
-    });
-
-    if (!fileList.data.files.length) {
-        console.log(`Spreadsheet named "${sheetName}" not found.`);
-        return { foundSheet: false };
-    }
-
-    const spreadsheetId = fileList.data.files[0].id;
-
-    // Step 2: Read column A
-    const result = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: 'Sheet1!A:A',
-    });
-
-    const rows = result.data.values || [];
-
-    for (let i = 0; i < rows.length; i++) {
-        if (rows[i][0] === valueToFind) {
-            return {
-                foundSheet: true,
-                foundValue: true,
-                spreadsheetId,
-                rowIndex: i + 1,
-            };
-        }
-    }
-
-    return {
-        foundSheet: true,
-        foundValue: false,
-        spreadsheetId,
-        rowIndex: null,
-    };
-}
-
-
 // Initialize the authenticated Sheets and Drive API clients
 function getSheetsAndDrive() {
     // Load Google service account credentials
@@ -136,6 +83,118 @@ app.post('/verify-token', (req, res) => {
         res.status(401).json({ valid: false, message: 'Invalid or expired token' });
     }
 });
+
+app.post('/check-status', async (req, res) => {
+    const { email, sheet } = req.body;
+  
+    try {
+      const result = await checkEmailStatus(email, sheet);
+      res.json(result);
+    } catch (error) {
+      console.error('Error checking email status:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+  });
+  
+
+async function checkEmailStatus(email, sheet) {
+    const { sheets, drive } = getSheetsAndDrive();
+
+    // Step 1: Find the spreadsheet by name
+    const fileList = await drive.files.list({
+        q: `name='${sheet}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed = false`,
+        fields: 'files(id, name)',
+    });
+
+    if (fileList.data.files.length === 0) {
+        throw new Error(`Spreadsheet named "${sheet}" not found.`);
+    }
+
+    const spreadsheetId = fileList.data.files[0].id;
+
+    // Step 2: Get columns A to C to check email and status
+    const range = 'Sheet1!A:C';
+    const response = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range,
+    });
+
+    const rows = response.data.values || [];
+
+    // Step 3: Search for the email and return the status
+    for (let row of rows) {
+        if (row[0] === email) {
+            const status = row[2] || 'Unknown';
+            return { success: true, status };
+        }
+    }
+
+    return { success: false, message: 'Email not found in sheet.' };
+}
+
+
+app.post('/update-sheet', async (req, res) => {
+    const { sheet: sheetName, email } = req.body;
+    try {
+        const result = await updateStatusToFinished(email, sheetName);
+        if (result.success) {
+            res.status(200).json({ valid: true, row: result.row });
+        } else {
+            res.status(400).json({ valid: false, message: result.message });
+        }
+    } catch (error) {
+        console.error('Error writing to sheet:', error);
+        res.status(500).json({ valid: false, message: `Can't write into Sheet` });
+    }
+});
+
+async function updateStatusToFinished(email, sheet) {
+    const { sheets, drive } = getSheetsAndDrive();
+
+    // Step 1: Find the spreadsheet by name
+    const fileList = await drive.files.list({
+        q: `name='${sheet}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed = false`,
+        fields: 'files(id, name)',
+    });
+
+    if (fileList.data.files.length === 0) {
+        throw new Error(`Spreadsheet named "${sheet}" not found.`);
+    }
+
+    const spreadsheetId = fileList.data.files[0].id;
+
+    // Step 2: Get all emails from column A
+    const range = 'Sheet1!A:A';
+    const response = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range,
+    });
+
+    const rows = response.data.values || [];
+
+    // Step 3: Find the row number for the given email
+    const rowIndex = rows.findIndex(row => row[0] === email);
+
+    if (rowIndex === -1) {
+        return { success: false, message: 'Email not found in the sheet.' };
+    }
+
+    const targetRow = rowIndex + 1; // +1 because sheets are 1-indexed
+
+    // Step 4: Update column C of that row (status column)
+    const updateRange = `Sheet1!C${targetRow}`;
+
+    await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: updateRange,
+        valueInputOption: 'RAW',
+        requestBody: {
+            values: [['Finished']],
+        },
+    });
+
+    return { success: true, row: targetRow, message: 'Status updated to Finished.' };
+}
 
 app.post('/write-sheet', async (req, res) => {
     const { sheet: sheetName, name: fullName, email, status } = req.body;
@@ -610,12 +669,12 @@ app.post('/send-mail', async (req, res) => {
     const email = req.body.email;
     const htmlContent = await getEmailTemplate(emailData, email);
     const transporter = nodemailer.createTransport({
-        host: 'server241.web-hosting.com',
+        host: process.env.HOST,
         port: 465, // Use 587 for TLS/STARTTLS
         secure: true, // true for port 465 (SSL), false for port 587 (TLS)
         auth: {
             user: 'users@peppubuild.com', // Your Namecheap Private Email address
-            pass: 'Peppu20011998.' // Your email account password
+            pass: process.env.PASSWORD // Your email account password
         }
     });
 
