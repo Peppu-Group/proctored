@@ -167,9 +167,8 @@ export default {
                 // Update the quiz details in the array
                 parsedQuizDetails[quizIndex] = updatedQuiz;
 
-                // Save updated quizzes back to localStorage
-                localStorage.setItem("quizDetails", JSON.stringify(parsedQuizDetails));
-                this.$store.commit('setQuizList', parsedQuizDetails);
+                // Dispatch the action to update the quiz
+                this.$store.dispatch('editQuiz', updatedQuiz);
 
                 // now, update the json file.
 

@@ -46,6 +46,13 @@ const store = createStore({
         setAccessToken(state, token) {
             state.accessToken = token;
             localStorage.setItem('authToken', token);
+        },
+        UPDATE_QUIZ(state, updatedQuiz) {
+            const index = state.quizList.findIndex(quiz => quiz.form === updatedQuiz.form);
+            if (index !== -1) {
+              // Replace the existing quiz with the updated one
+              state.quizList.splice(index, 1, updatedQuiz);
+            }
         }
     },
 
@@ -175,8 +182,23 @@ const store = createStore({
             } catch (err) {
                 Swal.fire('Error!', `An error occurred: ${err.message}`, 'error');
             }
-        }
+        },
+        async editQuiz({ commit, dispatch, state }, updatedQuiz) {
+            // update quizDetails in json file.
+            await dispatch('initAccessToken');
+            commit('UPDATE_QUIZ', updatedQuiz);
+            // Persist the updated quiz list to localStorage
+            localStorage.setItem('quizDetails', JSON.stringify(state.quizList));
+            
+            try {
+                await axios.post(`${serverUrl}/edit-quiz/${state.accessToken}`, {
+                    updatedProctoredData: state.quizList});
+            } catch (err) {
+                Swal.fire("Error!", `Couldn't update quiz: ${err}`, "error");
+            }
+            console.log(state.quizList)
 
+        }
     },
 
     getters: {

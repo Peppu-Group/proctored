@@ -12,7 +12,8 @@
         <div class="message-container">
           <h2 class="error-message">Oops! Page Not Found</h2>
           <p class="error-description">
-            The page or Exam you're looking for has drifted off into space.
+            The page or exam you're looking for has drifted off into space. 
+            You could be accessing an exam that doesn't exist or has expired.
           </p>
           
           <!-- Animated space traveler -->

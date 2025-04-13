@@ -319,6 +319,28 @@ app.post('/delete-sheet/:accessToken', async (req, res) => {
     }
 });
 
+app.post('/edit-quiz/:accessToken', async (req, res) => {
+    const accessToken = req.params.accessToken;
+    const {updatedProctoredData } = req.body;
+
+    try {
+
+        await updateData(updatedProctoredData, accessToken);
+
+        res.status(200).json({
+            success: true,
+            message: `proctored.json updated.`,
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update proctored.json',
+            error: error.message,
+        });
+    }
+});
+
 // Route to get proctored.json content
 app.get('/get-proctored/:accessToken', async (req, res) => {
     const accessToken = req.params.accessToken;

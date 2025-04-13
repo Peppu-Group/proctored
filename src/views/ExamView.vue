@@ -77,7 +77,8 @@ export default {
             const res = await axios.get(`${serverUrl}/validate-link`);
             const proctoredData = res.data.data;
             const isFound = proctoredData.find(quiz => quiz.form === formId);
-            if (!isFound) {
+            const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
+            if (!isFound || !isAvailable) {
                 this.$router.push({ name: 'NotFound' })
             } else {
                 // store form name
@@ -87,8 +88,9 @@ export default {
                         email: this.email,
                         sheet: this.name,
                     });
-                    console.log(response.data.status )
+                    console.log(response.data.status)
                     if (response.data.status == 'Progress') {
+                        // get start and endtime and ensure it is within timeframe.
                         // load form and corresponding time.
                         const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
                         const iframe = document.getElementById("examFrame");
@@ -126,6 +128,27 @@ export default {
 
     },
     methods: {
+        isTimeFrame(startDateTime, endDateTime) {
+            const now = new Date();
+
+            // If both start and end times are provided
+            if (startDateTime && endDateTime) {
+                return now >= new Date(startDateTime) && now <= new Date(endDateTime);
+            }
+
+            // If only start time is provided
+            if (startDateTime && !endDateTime) {
+                return now >= new Date(startDateTime);
+            }
+
+            // If only end time is provided
+            if (!startDateTime && endDateTime) {
+                return now <= new Date(endDateTime);
+            }
+
+            // If neither is provided, allow access by default
+            return true;
+        },
         async verifyToken() {
             let token = this.$route.query.token;
             // get token from route and verify it. if valid, give them access to the exam.
