@@ -26,10 +26,10 @@
                         <tbody>
                             <tr v-for="quiz in quizList" :key="quiz.form" @click="getLink(quiz.form, quiz.name, quiz.time)">
                                 <td>{{ quiz.name }}</td>
-                                <td>{{ quiz.time }} min<br>{{ quiz.start ?  quiz.start: 'Start at any time'}}</td>
+                                <td>{{ quiz.time }} min<br>{{ formatTime(quiz.start) || 'Start at any time'}}</td>
                                 <td>{{ quiz.type }}<br>{{ formatDate(quiz.date) }}</td>
                                 <td>{{ quiz.sharing ? quiz.sharing : 'Anyone can take test' }}</td>
-                                <td>{{ quiz.end ? quiz.end: 'Take Quiz at any time' }} </td>
+                                <td>{{ formatTime(quiz.end) || 'Take Quiz at any time' }} </td>
                             </tr>
                         </tbody>
                     </table>
@@ -57,6 +57,20 @@ export default {
     },
 
     methods: {
+        formatTime(date) {
+            if (!date) return null;
+            // const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // console.log(userTimeZone); // e.g., "Africa/Lagos"
+            return new Date(date).toLocaleString("en-US", {
+            // timeZone: userTimeZone,
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+            });
+        },
         formatDate(date) {
             return new Date(date).toLocaleDateString("en-US", {
                 day: "numeric",
