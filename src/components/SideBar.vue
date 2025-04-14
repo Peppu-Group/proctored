@@ -63,7 +63,7 @@ export default {
             createQuiz()
         },
         getResults(id) {
-            Swal.fire("Coming soon!", "You will be able to see quiz score for students (on quiz mode) and proctoring violations, or just violations", "info");
+            Swal.fire("Coming soon!", "You will be able to see quiz score for students (on quiz mode) and proctoring violations, or just violations if you're not in quiz mode.", "info");
             /*
             // make sure EndDate is set. 
             const isFound = this.$store.getters.quizList.find(quiz => quiz.form === id);
@@ -201,10 +201,19 @@ export default {
             }
         },
         async deleteQuiz(formIdToDelete, sheetName) {
-            this.$store.dispatch('removeQuiz', {
-                formIdToDelete,
-                sheetName
+            Swal.fire({
+                title: "Are you sure you want to delete this quiz?",
+                showCancelButton: true,
+                confirmButtonText: "Delete",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.$store.dispatch('removeQuiz', {
+                        formIdToDelete,
+                        sheetName
+                    });
+                } 
             });
+
         }
 
 

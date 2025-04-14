@@ -11,6 +11,8 @@
             <li id="ipg0l" class="nav-item"><a aria-current="page" href="/pricing" id="iak5w-2"
                 class="nav-link">Pricing</a></li><a aria-current="page" href="/contact" id="iak5w-2-6"
               class="nav-link">Contact</a>
+              <a aria-current="page" href="/app" id="iak5w-2-6"
+              class="nav-link">Dashboard</a>
             <li id="i8u3z" class="nav-item dropdown"></li>
           </ul>
           <form id="i3sse" class="d-flex">
