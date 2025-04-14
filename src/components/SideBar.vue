@@ -27,6 +27,7 @@
                         <a class="dropdown-item" href="#" @click="deleteQuiz(quiz.form, quiz.name)">Delete</a>
                         <a class="dropdown-item" href="#" @click="editQuiz(quiz.form)">Edit</a>
                         <a class="dropdown-item" href="#" @click="getLink(quiz.form)">Get Link</a>
+                        <a class="dropdown-item" href="#" @click="getResults(quiz.form)">Get Results</a>
                     </div>
                 </div>
             </div>
@@ -60,6 +61,29 @@ export default {
         },
         addQuiz() {
             createQuiz()
+        },
+        getResults(id) {
+            Swal.fire("Coming soon!", "You will be able to see quiz score for students (on quiz mode) and proctoring violations, or just violations", "info");
+            /*
+            // make sure EndDate is set. 
+            const isFound = this.$store.getters.quizList.find(quiz => quiz.form === id);
+            if (this.isCurrentDateTimeAfterEnd(isFound.end)) {
+                // send a mail on successful result retrieving. explain to them that we're working on including quiz scores and
+                // we just show tab violations now. Tell them we don't stop exam on violations, because the examinner can 
+                // filter results according to violations.
+
+            } else {
+                // if endtime hasn't reach yet, let them know that they can't get results until after exams.
+                // If not, let the user know they can't retrieve results until an end time is set.
+                Swal.fire("Exam isn't over yet", "You can't access quiz score until exam end date. Set an end date/time by clicking on the edit button of the quiz", "info");
+            }
+            */
+        },
+        isCurrentDateTimeAfterEnd(endDateStr) {
+            const now = new Date();
+            const endDate = new Date(endDateStr);
+
+            return now >= endDate;
         },
         async editQuiz(formIdToEdit) {
             // Retrieve existing quizzes from localStorage
