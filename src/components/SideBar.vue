@@ -113,7 +113,7 @@ export default {
                 <div style="text-align: left; padding: 10px 5px;">
                     <div style="margin-bottom: 15px;">
                         <label for="quizName" style="display: block; font-weight: 600; margin-bottom: 5px;">Quiz Name: <span style="color: #e74c3c;">*</span></label>
-                        <input id="quizName" class="swal2-input" placeholder="Enter Quiz Name" value="${existingQuiz.name}" style="width: 100%; margin: 5px 0;">
+                        <input id="quizName" class="swal2-input" placeholder="Enter Quiz Name" value="${existingQuiz.name}" readonly style="width: 100%; margin: 5px 0;">
                     </div>
 
                     <div style="margin-bottom: 15px;">
