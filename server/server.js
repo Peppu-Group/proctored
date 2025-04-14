@@ -198,7 +198,6 @@ async function updateStatusToFinished(email, sheet, violations) {
 
 app.post('/write-sheet', async (req, res) => {
     const { sheet: sheetName, name: fullName, email, status } = req.body;
-    console.log(sheetName, fullName, email, status);
     try {
         const result = await findOrWriteToSheet(email, sheetName, fullName, status);
         if (result.success) {
@@ -207,8 +206,7 @@ app.post('/write-sheet', async (req, res) => {
             res.status(400).json({ valid: false, message: result.message });
         }
     } catch (error) {
-        console.error('Error writing to sheet:', error);
-        res.status(500).json({ valid: false, message: `Can't write into Sheet` });
+        res.status(500).json({ valid: false, message: `Can't write into Sheet: ${error}` });
     }
 });
 
@@ -227,8 +225,6 @@ async function findOrWriteToSheet(email, sheet, name, status) {
     }
 
     const spreadsheetId = fileList.data.files[0].id;
-    console.log(spreadsheetId)
-
     // Step 2: Get all values from column A
     const range = 'Sheet1!A:A';
     const response = await sheets.spreadsheets.values.get({
@@ -243,7 +239,6 @@ async function findOrWriteToSheet(email, sheet, name, status) {
 
     if (emailExists) {
         // Email already exists; do nothing
-        console.log('Email already exists in the sheet.')
         return { success: false, message: 'Email already exists in the sheet.' };
     }
 
@@ -395,7 +390,6 @@ async function deleteSheet(sheetName) {
         const files = response.data.files;
 
         if (!files || files.length === 0) {
-            console.log(`No Google Sheet named "${sheetName}" found.`);
             return;
         }
 
@@ -404,10 +398,8 @@ async function deleteSheet(sheetName) {
             await drive.files.delete({
                 fileId: file.id,
             });
-            console.log(`Deleted sheet "${file.name}" with ID: ${file.id}`);
         }
     } catch (err) {
-        console.error('Error deleting Google Sheet:', err.message);
         throw err;
     }
 }
@@ -429,7 +421,6 @@ app.post('/create-project', async (req, res) => {
         let sheetId;
         if (existingSheets.data.files.length > 0) {
             sheetId = existingSheets.data.files[0].id;
-            console.log(`Sheet "${sheetName}" already exists.`);
         } else {
             // Create new Sheet
             const { sheets, drive } = getSheetsAndDrive();
@@ -441,7 +432,7 @@ app.post('/create-project', async (req, res) => {
                 fields: 'id',
             });
             sheetId = newSheet.data.id;
-            console.log(`Created new sheet: "${sheetName}"`);
+            res.send(`Created new sheet: "${sheetName}"`);
             
         }
 
@@ -456,7 +447,6 @@ app.post('/create-project', async (req, res) => {
         if (existingJson.data.files.length > 0) {
             jsonId = existingJson.data.files[0].id;
             updateData(bodyData, accessToken)
-            console.log('proctored.json already exists.');
         } else {
             // Create new JSON file
             const fileMetadata = {
@@ -486,17 +476,11 @@ app.post('/create-project', async (req, res) => {
                 await service.permissions.create({
                     fileId: jsonId,
                     resource: permission,
-                }).then((response) => {                    
-                    console.log(`${response}`);
-
-                    console.log(`Permission granted for json - type: ${response.data.type}, role: ${response.data.role}, for: ${response.data.emailAddress}`);
-
                 })
-                console.log('File shared with the service account');
             } catch (err) {
-                console.error('Error sharing file:', err);
+                res.send('Error sharing file:', err);
             }
-            console.log('Created new proctored.json file.');
+            res.send('Created new proctored.json file.');
         }
 
         res.json({
@@ -505,7 +489,6 @@ app.post('/create-project', async (req, res) => {
             jsonId,
         });
     } catch (err) {
-        console.error('Error during file creation:', err);
         res.status(500).json({
             success: false,
             message: 'Failed to create project files',
