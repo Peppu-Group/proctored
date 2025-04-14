@@ -65,7 +65,21 @@ export default {
     data() {
         return {
             loading: true, // Show loading until iframe is ready.
-            email: null
+            email: null,
+            monitoringActive: false,
+            userWarned: false,
+            lastActiveTime: Date.now(),
+            tabId: Date.now().toString(),
+            checkInterval: null,
+            focusCheckInterval: null,
+            broadcastChannel: null,
+            statusMessage: 'Quiz monitoring is not active.',
+            violations: 0, // Track number of violations
+            violationDetails: {
+                tabSwitches: 0,
+                focusLoss: 0,
+                newTabs: 0
+            }
         };
     },
     async mounted() {
@@ -101,6 +115,35 @@ export default {
 
                         // set Timer
                         localStorage.setItem("currentTime", isFound.time)
+
+                        Swal.fire({
+                            title: 'Important: Close All Other Tabs',
+                            html: `
+                                <div style="text-align: left">
+                                    <p><strong>You may have multiple tabs or windows open.</strong></p>
+                                    <p>We won't penalize you if you have multiple tabs and windows open before the exam, 
+                                        but we will, once you leave to another tab. Please close ALL other browser tabs and windows before continuing.</p>
+                                    <p>Steps to prepare:</p>
+                                    <ol>
+                                        <li>Close all other browser tabs and windows.</li>
+                                        <li>Disable any background applications that might open popups</li>
+                                        <li>Turn off notifications that might distract you</li>
+                                        <li>After closing all tabs, click "Continue"</li>
+                                    </ol>
+                                </div>
+                            `,
+                            icon: 'warning',
+                            showCancelButton: false,
+                            confirmButtonText: 'Continue',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                this.startMonitoring();
+                            } else {
+                                // Give them another chance after delay
+                                setTimeout(() => this.showInitialSetupModal(), 3000);
+                            }
+                        });
 
                         // When the form finishes loading
                         iframe.onload = () => {
@@ -177,7 +220,8 @@ export default {
             try {
                 await axios.post(`${serverUrl}/update-sheet`, {
                     sheet: name,
-                    email: email
+                    email: email,
+                    violations: this.violations
                 });
             } catch (err) {
                 console.log('err occurred')
@@ -224,7 +268,237 @@ export default {
                     this.$router.push('/success')
                 }
             }, 1000);
+        },
+        // Show initial setup modal
+        showInitialSetupModal() {
+            Swal.fire({
+                title: 'Important: Close All Other Tabs',
+                html: `
+                    <div style="text-align: left">
+                        <p><strong>You currently have multiple tabs or windows open.</strong></p>
+                        <p>Please close ALL other browser tabs and windows before continuing.</p>
+                        <p>Steps to prepare:</p>
+                        <ol>
+                            <li>Close all other browser tabs and windows</li>
+                            <li>Disable any background applications that might open popups</li>
+                            <li>Turn off notifications that might distract you</li>
+                            <li>After closing all tabs, click "Check Again"</li>
+                        </ol>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Check Again',
+                cancelButtonText: 'I need more time',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.startMonitoring();
+                } else {
+                    // Give them another chance after delay
+                    setTimeout(() => this.showInitialSetupModal(), 3000);
+                }
+            });
+        },
+
+        // Start the monitoring system
+        startMonitoring() {
+            // Set flag that monitoring is active
+            this.monitoringActive = true;
+            this.statusMessage = 'Quiz monitoring is active - do not open other tabs';
+
+            // Create a broadcast channel for tab communication
+            this.broadcastChannel = new BroadcastChannel('quiz_security_channel');
+
+            // Set up broadcast channel listeners
+            this.setupBroadcastListener();
+
+            // Start regular broadcasts
+            this.startBroadcasting();
+
+            // Add visibility change listener
+            this.setupVisibilityListener();
+
+            // Set up focus checks
+            this.setupFocusChecks();
+
+            // Set up activity monitoring
+            this.setupActivityMonitoring();
+
+            // Setup periodic activity check
+            this.checkInterval = setInterval(this.checkUserActivity, 5000);
+
+            // Block context menu
+            this.blockContextMenu();
+
+            // Warn on page exit
+            this.setupBeforeUnloadWarning();
+
+            // Show confirmation alert
+            Swal.fire({
+                title: 'Monitoring Active',
+                text: 'Tab monitoring is now active. Please do not open new tabs or windows during your quiz.',
+                icon: 'success',
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        },
+
+        // Set up the broadcast channel listener
+        setupBroadcastListener() {
+            this.broadcastChannel.onmessage = (event) => {
+                if (event.data.type === 'presence' && event.data.id !== this.tabId) {
+                    // Another tab was opened
+                    this.logViolation('opened a new browser tab');
+                }
+            };
+        },
+
+        // Start broadcasting presence on the channel
+        startBroadcasting() {
+            // Broadcast initial presence
+            this.broadcastPresence();
+
+            // Set up interval for regular broadcasts
+            setInterval(() => this.broadcastPresence(), 1000);
+        },
+
+        // Broadcast this tab's presence
+        broadcastPresence() {
+            if (this.broadcastChannel && this.monitoringActive) {
+                this.broadcastChannel.postMessage({
+                    type: 'presence',
+                    id: this.tabId,
+                    timestamp: Date.now()
+                });
+            }
+        },
+
+        // Set up visibility change listener
+        setupVisibilityListener() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    this.logViolation('switched to another tab or window');
+                } else {
+                    this.updateUserActivity();
+                }
+            });
+        },
+
+        // Set up focus checks
+        setupFocusChecks() {
+            this.focusCheckInterval = setInterval(() => {
+                if (!document.hasFocus() && this.monitoringActive) {
+                    this.logViolation('lost focus on this tab');
+                }
+            }, 2000);
+        },
+
+        // Set up activity monitoring
+        setupActivityMonitoring() {
+            document.addEventListener('mousemove', this.updateUserActivity);
+            document.addEventListener('keydown', this.updateUserActivity);
+            document.addEventListener('click', this.updateUserActivity);
+        },
+
+        // Block context menu
+        blockContextMenu() {
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+        },
+
+        // Set up beforeunload warning
+        setupBeforeUnloadWarning() {
+            window.addEventListener('beforeunload', (e) => {
+                if (this.monitoringActive) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                    return '';
+                }
+            });
+        },
+
+        // Check if user has been inactive
+        checkUserActivity() {
+            if (!this.monitoringActive) return;
+
+            const inactiveTime = Date.now() - this.lastActiveTime;
+            // If inactive for more than 30 seconds
+            if (inactiveTime > 30000 && !this.userWarned) {
+                this.userWarned = true;
+                Swal.fire({
+                    title: 'Are you still there?',
+                    text: 'We detected no activity. Please continue with your quiz.',
+                    icon: 'question',
+                    confirmButtonText: 'I\'m here',
+                    allowOutsideClick: false
+                }).then(() => {
+                    this.userWarned = false;
+                    this.updateUserActivity();
+                });
+            }
+        },
+
+        // Update last active time
+        updateUserActivity() {
+            this.lastActiveTime = Date.now();
+        },
+
+        // Log violations and alert user
+        logViolation(violationType) {
+            if (!this.monitoringActive || this.userWarned) return;
+
+            // Increment the violations counter
+            this.violations++;
+
+            // Track specific violation types
+            if (violationType.includes('switched to another tab')) {
+                this.violationDetails.tabSwitches++;
+            } else if (violationType.includes('lost focus')) {
+                this.violationDetails.focusLoss++;
+            } else if (violationType.includes('opened a new browser tab')) {
+                this.violationDetails.newTabs++;
+            }
+
+            // Log to console (in a real app, send to server)
+            console.warn(`Violation detected: ${violationType} at ${new Date().toISOString()}`);
+            console.log(`Total violations: ${this.violations}`);
+            console.log('Violation details:', this.violationDetails);
+
+            // Alert the user
+            this.userWarned = true;
+            Swal.fire({
+                title: 'Warning: Suspicious Activity',
+                html: `
+                    <div style="text-align: left">
+                        <p>We detected that you ${violationType}.</p>
+                        <p>This activity has been logged and reported.</p>
+                        <p><strong>Violation #${this.violations}</strong></p>
+                        <p>Please remain on this tab for the duration of your quiz.</p>
+                    </div>
+                `,
+                icon: 'warning',
+                confirmButtonText: 'I understand',
+                allowOutsideClick: false
+            }).then(() => {
+                this.userWarned = false;
+                this.updateUserActivity();
+            });
         }
+    },
+    // Clean up when component is destroyed
+    beforeDestroy() {
+        // Clear all intervals
+        if (this.checkInterval) clearInterval(this.checkInterval);
+        if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+
+        // Close broadcast channel
+        if (this.broadcastChannel) this.broadcastChannel.close();
+
+        // Remove event listeners
+        document.removeEventListener('mousemove', this.updateUserActivity);
+        document.removeEventListener('keydown', this.updateUserActivity);
+        document.removeEventListener('click', this.updateUserActivity);
     }
 };
 </script>

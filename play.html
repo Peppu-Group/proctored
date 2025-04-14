@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Document</title>
+</head>
+<body>
+    <script>
+   // Global state tracking
+let monitoringActive = false;
+let initialWindowCount = 0;
+let userWarned = false;
+let lastActiveTime = Date.now();
+let checkInterval = null;
+let focusCheckInterval = null;
+let tabId = Date.now().toString();
+
+// Function to show initial setup modal
+function showInitialSetupModal() {
+  Swal.fire({
+    title: 'Important: Close All Other Tabs',
+    html: `
+      <div style="text-align: left">
+        <p><strong>You currently have multiple tabs or windows open.</strong></p>
+        <p>Please close ALL other browser tabs and windows before continuing.</p>
+        <p>Steps to prepare:</p>
+        <ol>
+          <li>Close all other browser tabs and windows</li>
+          <li>Disable any background applications that might open popups</li>
+          <li>Turn off notifications that might distract you</li>
+          <li>After closing all tabs, click "Check Again"</li>
+        </ol>
+      </div>
+    `,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Check Again',
+    cancelButtonText: 'I need more time',
+    allowOutsideClick: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      checkForOpenTabs();
+    } else {
+      // Give them another chance after delay
+      setTimeout(showInitialSetupModal, 3000);
+    }
+  });
+}
+
+// Function to check for open tabs
+function checkForOpenTabs() {
+  // Clear existing data
+  localStorage.removeItem('quiz_active_tabs');
+  localStorage.removeItem('quiz_tab_ping');
+  
+  // Set a unique identifier for this tab
+  sessionStorage.setItem('quiz_tab_id', tabId);
+  localStorage.setItem('quiz_tab_ping', Date.now().toString());
+  
+  // Wait for potential responses from other tabs
+  setTimeout(() => {
+    const activeTabs = localStorage.getItem('quiz_active_tabs');
+    const tabsData = activeTabs ? JSON.parse(activeTabs) : [];
+    
+    // Filter out stale tabs (older than 5 seconds)
+    const currentTime = Date.now();
+    const freshTabs = tabsData.filter(tab => (currentTime - tab.timestamp) < 5000);
+    
+    if (freshTabs.length > 0) {
+      // Other tabs are open
+      Swal.fire({
+        title: 'Other Tabs Still Open',
+        html: `
+          <div style="text-align: left">
+            <p>We detected ${freshTabs.length} other tab(s) still open in your browser.</p>
+            <p>Please close <strong>ALL</strong> other tabs and windows before continuing.</p>
+          </div>
+        `,
+        icon: 'error',
+        confirmButtonText: 'I\'ll close them',
+        allowOutsideClick: false
+      }).then(() => {
+        setTimeout(showInitialSetupModal, 2000);
+      });
+    } else {
+      // No other tabs detected, start monitoring
+      startTabMonitoring();
+    }
+  }, 1000); // Give other tabs time to respond
+}
+
+// Listen for ping from checking tab
+window.addEventListener('storage', (e) => {
+  if (e.key === 'quiz_tab_ping') {
+    // Another tab is checking, report this tab as active
+    const tabId = sessionStorage.getItem('quiz_tab_id') || 'unknown';
+    const activeTabs = localStorage.getItem('quiz_active_tabs');
+    let tabsData = activeTabs ? JSON.parse(activeTabs) : [];
+    
+    // Add this tab to the list
+    tabsData.push({
+      id: tabId,
+      url: window.location.href,
+      timestamp: Date.now()
+    });
+    
+    localStorage.setItem('quiz_active_tabs', JSON.stringify(tabsData));
+  }
+});
+
+// Function to start monitoring
+function startTabMonitoring() {
+  // Set flag that monitoring is active
+  monitoringActive = true;
+  
+  // Create a broadcast channel for tab communication
+  const broadcastChannel = new BroadcastChannel('quiz_security_channel');
+  
+  // Broadcast this tab's existence
+  function broadcastPresence() {
+    broadcastChannel.postMessage({
+      type: 'presence',
+      id: tabId,
+      timestamp: Date.now()
+    });
+  }
+  
+  // Listen for messages from other tabs
+  broadcastChannel.onmessage = (event) => {
+    if (event.data.type === 'presence' && event.data.id !== tabId) {
+      // Another tab was opened
+      logViolation('opened a new browser tab');
+    }
+  };
+  
+  // Regularly broadcast presence
+  setInterval(broadcastPresence, 1000);
+  broadcastPresence(); // Initial broadcast
+  
+  // Add visibility change listener to detect when this tab becomes hidden
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      logViolation('switched to another tab or window');
+    } else {
+      updateUserActivity();
+    }
+  });
+  
+  // Set up periodic focus checks (more reliable than visibilitychange in some browsers)
+  focusCheckInterval = setInterval(() => {
+    if (!document.hasFocus() && monitoringActive) {
+      logViolation('lost focus on this tab');
+    }
+  }, 2000);
+  
+  // Setup periodic activity check
+  checkInterval = setInterval(checkUserActivity, 5000);
+
+  // Track user activity
+  document.addEventListener('mousemove', updateUserActivity);
+  document.addEventListener('keydown', updateUserActivity);
+  document.addEventListener('click', updateUserActivity);
+  
+  // Block right-click context menu
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+  
+  // Alert when user tries to leave the page
+  window.addEventListener('beforeunload', (e) => {
+    if (monitoringActive) {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+  });
+  
+  // Show confirmation
+  Swal.fire({
+    title: 'Monitoring Active',
+    text: 'Tab monitoring is now active. Please do not open new tabs or windows during your quiz.',
+    icon: 'success',
+    timer: 3000,
+    timerProgressBar: true,
+    showConfirmButton: false
+  });
+}
+
+// Update last active time
+function updateUserActivity() {
+  lastActiveTime = Date.now();
+}
+
+// Check if user has been inactive
+function checkUserActivity() {
+  if (!monitoringActive) return;
+  
+  const inactiveTime = Date.now() - lastActiveTime;
+  // If inactive for more than 30 seconds
+  if (inactiveTime > 30000 && !userWarned) {
+    userWarned = true;
+    Swal.fire({
+      title: 'Are you still there?',
+      text: 'We detected no activity. Please continue with your quiz.',
+      icon: 'question',
+      confirmButtonText: 'I\'m here',
+      allowOutsideClick: false
+    }).then(() => {
+      userWarned = false;
+      updateUserActivity();
+    });
+  }
+}
+
+// Log violations to server and alert user
+function logViolation(violationType) {
+  if (!monitoringActive || userWarned) return;
+  
+  // Log to console (in a real app, send to server)
+  console.warn(`Violation detected: ${violationType} at ${new Date().toISOString()}`);
+  
+  // Alert the user
+  userWarned = true;
+  Swal.fire({
+    title: 'Warning: Suspicious Activity',
+    html: `
+      <div style="text-align: left">
+        <p>We detected that you ${violationType}.</p>
+        <p>This activity has been logged and reported.</p>
+        <p>Please remain on this tab for the duration of your quiz.</p>
+      </div>
+    `,
+    icon: 'warning',
+    confirmButtonText: 'I understand',
+    allowOutsideClick: false
+  }).then(() => {
+    userWarned = false;
+    updateUserActivity();
+  });
+}
+
+// Start the process when page loads
+window.onload = function() {
+  showInitialSetupModal();
+}
+    </script>
+</body>
+</html>

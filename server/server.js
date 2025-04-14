@@ -134,9 +134,9 @@ async function checkEmailStatus(email, sheet) {
 
 
 app.post('/update-sheet', async (req, res) => {
-    const { sheet: sheetName, email } = req.body;
+    const { sheet: sheetName, email, violations } = req.body;
     try {
-        const result = await updateStatusToFinished(email, sheetName);
+        const result = await updateStatusToFinished(email, sheetName, violations);
         if (result.success) {
             res.status(200).json({ valid: true, row: result.row });
         } else {
@@ -148,7 +148,7 @@ app.post('/update-sheet', async (req, res) => {
     }
 });
 
-async function updateStatusToFinished(email, sheet) {
+async function updateStatusToFinished(email, sheet, violations) {
     const { sheets, drive } = getSheetsAndDrive();
 
     // Step 1: Find the spreadsheet by name
@@ -182,14 +182,14 @@ async function updateStatusToFinished(email, sheet) {
     const targetRow = rowIndex + 1; // +1 because sheets are 1-indexed
 
     // Step 4: Update column C of that row (status column)
-    const updateRange = `Sheet1!C${targetRow}`;
+    const updateRange = `Sheet1!C${targetRow}:D${targetRow}`;
 
     await sheets.spreadsheets.values.update({
         spreadsheetId,
         range: updateRange,
         valueInputOption: 'RAW',
         requestBody: {
-            values: [['Finished']],
+            values: [['Finished', `${violations}`]],
         },
     });
 
