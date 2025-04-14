@@ -102,7 +102,6 @@ export default {
                         email: this.email,
                         sheet: this.name,
                     });
-                    console.log(response.data.status)
                     if (response.data.status == 'Progress') {
                         // get start and endtime and ensure it is within timeframe.
                         // load form and corresponding time.
@@ -157,7 +156,7 @@ export default {
                             this.startTimer();
                         };
                     } else {
-                        console.warn(response.data.message);
+                        Swal.fire("Test Unavailable!", `You have taken this test already`, "info");
                         return null;
                     }
                 } catch (error) {
@@ -203,17 +202,16 @@ export default {
             // the submitting should return the user's email.
             try {
                 const res = await axios.post(`${serverUrl}/verify-token`, { token });
-                console.log(res)
                 if (res.data.valid) {
+                    // store email in this.email, showing email is valid
                     this.email = res.data.email;
-                    // search google sheet for user email, if not present,log the user into googlesheet
-
                     // else send swal that they've already taken the test
                 } else {
-                    // send swal that they're using an expired link and exam can't be found. 
+                    Swal.fire("Error!", `We can't log you in, you seem to be using an expired link`, "error");
+                    return null;
                 }
             } catch (err) {
-                console.log(err)
+                Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
             }
         },
         async updateSheet(name, email) {
@@ -224,13 +222,12 @@ export default {
                     violations: this.violations
                 });
             } catch (err) {
-                console.log('err occurred')
+                Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
             }
         },
         startTimer() {
             const startTime = parseInt(localStorage.getItem("examStartTime"));
             const duration = parseInt(localStorage.getItem("currentTime")) || 5; // Default 5 minutes
-            console.log(duration)
 
             const examEndTime = startTime + duration * 60 * 1000;
 
@@ -247,13 +244,6 @@ export default {
                     // push this to exam done, let user know their response have been recorded.
                     // alert("Time is up! Submitting the exam now.");
 
-                    try {
-                        const form = document.querySelector("iframe").contentWindow.document.querySelector("form");
-                        if (form) form.submit();
-                    } catch (e) {
-                        console.warn("Form submit failed (possibly due to cross-origin policy):", e);
-                    }
-
                     // send the email, fullname, and testinfo to googlesheet.
                     // I propose the user's fullname and email are saved to their localstorage in the mounted guard for exam.
                     // possibly pass it as a simple jwt token, no need to add secret and verifying in backend.
@@ -263,7 +253,7 @@ export default {
                     try {
                         this.updateSheet(this.name, this.email)
                     } catch (err) {
-                        console.log(err)
+                        Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
                     }
                     this.$router.push('/success')
                 }
@@ -459,11 +449,6 @@ export default {
             } else if (violationType.includes('opened a new browser tab')) {
                 this.violationDetails.newTabs++;
             }
-
-            // Log to console (in a real app, send to server)
-            console.warn(`Violation detected: ${violationType} at ${new Date().toISOString()}`);
-            console.log(`Total violations: ${this.violations}`);
-            console.log('Violation details:', this.violationDetails);
 
             // Alert the user
             this.userWarned = true;

@@ -193,11 +193,6 @@ export default {
 
                 // Dispatch the action to update the quiz
                 this.$store.dispatch('editQuiz', updatedQuiz);
-
-                // now, update the json file.
-
-                // Show success message
-                Swal.fire("Success!", "Quiz details updated!", "success");
             }
         },
         async deleteQuiz(formIdToDelete, sheetName) {

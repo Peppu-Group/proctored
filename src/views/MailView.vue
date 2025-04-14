@@ -78,16 +78,28 @@ export default {
                             // Display success alert
                             Swal.fire('Success!', 'We have sent your test link to your mailbox', 'success');
                         } catch (err) {
-                            console.log(err)
+                            // Clear form fields
+                            this.fullName = '';
+                            this.email = '';
+                            Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
                         }
                     } else {
-                        console.log('An error occurred, we could not register you for the test')
+                        // Clear form fields
+                        this.fullName = '';
+                            this.email = '';
+                        Swal.fire('Link Unavailable', `This link is unavailable because you have either registered for this exam or the organizer didn't include you as a participant`, 'error');
                     }
                 } catch (err) {
-                    console.log(err)
+                    // Clear form fields
+                    this.fullName = '';
+                    this.email = '';
+                    Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
                 }
             } else {
-                console.log(`can't send mail`)
+                // Clear form fields
+                this.fullName = '';
+                this.email = '';
+                Swal.fire("Error!", `This link is broken, please ensure you have the correct link`, "error");
             }
         }
     }

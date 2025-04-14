@@ -100,7 +100,7 @@ export default {
             try {
                 window.location.href = OAUTH_URL;
             } catch (err) {
-                console.log(err)
+                Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
             }
         }
     }

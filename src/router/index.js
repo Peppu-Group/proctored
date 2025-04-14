@@ -91,8 +91,6 @@ const router = createRouter({
 // Global navigation guard
 router.beforeEach((to, from, next) => {
   const isLoggedIn = store.state.accessToken; // assumes boolean in Vuex state
-  console.log(isLoggedIn)
-
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isLoggedIn) {
       next('/login');

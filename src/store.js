@@ -72,10 +72,8 @@ const store = createStore({
                 const res = await axios.get(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${token}`);
                 if (res.data) {
                     commit('setAccessToken', token);
-                    console.log('Access token validated and set');
                 }
             } catch (err) {
-                console.warn('Token invalid, refreshing...');
                 await dispatch('refreshAccessToken');
             }
         },
@@ -87,13 +85,14 @@ const store = createStore({
                     const newToken = res.data.accessToken;
                     if (newToken) {
                         commit('setAccessToken', newToken);
-                        console.log('Refreshed and saved new access token');
                     }
                 } catch (err) {
-                    console.error('Failed to refresh access token:', err);
+                    Swal.fire('An error occurred', `Failed to refresh access token: ${err}`, 'error');
                 }
             } else {
                 // do something to remove access to peppubuild so that the user will get accessToken and clear accessToken
+                // fetch refreshtoken from json file.
+                console.log('blah')
             }
         },
 
@@ -189,15 +188,15 @@ const store = createStore({
             commit('UPDATE_QUIZ', updatedQuiz);
             // Persist the updated quiz list to localStorage
             localStorage.setItem('quizDetails', JSON.stringify(state.quizList));
-            
+
             try {
                 await axios.post(`${serverUrl}/edit-quiz/${state.accessToken}`, {
                     updatedProctoredData: state.quizList});
+                // Show success message
+                Swal.fire("Success!", "Quiz details updated!", "success");
             } catch (err) {
                 Swal.fire("Error!", `Couldn't update quiz: ${err}`, "error");
             }
-            console.log(state.quizList)
-
         }
     },
 
