@@ -68,20 +68,57 @@ h1 {
 
 <script>
 import qs from 'querystring';
+const serverUrl = `http://localhost:3000`;
+import axios from 'axios';
 
 export default {
     name: 'LoginView',
 
-    mounted() {
-        if (this.$route.query.token) {
-            localStorage.setItem('authToken', this.$route.query.token);
-            this.$store.commit('setAccessToken', this.$route.query.token);
+    async mounted() {
+        const { token, refresh } = this.$route.query;
+        if (!token) return;
+
+        try {
+            // Fetch user info using the access token
+            const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const { email, name } = userInfoResponse.data;
+
+            // Store user information and tokens
+            localStorage.setItem('email', email);
+            localStorage.setItem('authToken', token);
+            this.$store.commit('setAccessToken', token);
+
+            if (refresh) {
+                // Store the refresh token
+                localStorage.setItem('refreshToken', encodeURIComponent(refresh));
+
+                // Send welcome email
+                try {
+                    await axios.post(`${serverUrl}/send-welcome`, { name, email });
+                } catch (err) {
+                    Swal.fire("Error!", `An error occurred while sending the welcome email: ${err}`, "error");
+                }
+            } else {
+                // Retrieve and store the refresh token if not present
+                let refreshToken = localStorage.getItem('refreshToken');
+                if (!refreshToken) {
+                    try {
+                        const res = await axios.get(`${serverUrl}/getrefresh/${email}`);
+                        localStorage.setItem('refreshToken', encodeURIComponent(res.data));
+                    } catch (err) {
+                        Swal.fire("Error!", `An error occurred while retrieving the refresh token: ${err}`, "error");
+                    }
+                }
+            }
+
+            // Redirect to the main application page
             this.$router.push({ path: '/app' });
-        } else if (this.$route.query.refresh && this.$route.query.token) {
-            localStorage.setItem('authToken', this.$route.query.token);
-            localStorage.setItem('refreshToken', this.$route.query.refresh);
-            this.$store.commit('setAccessToken', this.$route.query.token);
-            this.$router.push({ path: '/app' });
+
+        } catch (err) {
+            Swal.fire("Error!", `Failed to fetch user information: ${err}`, "error");
         }
     },
 
@@ -89,14 +126,14 @@ export default {
         async getlogin() {
             // NOTE: ONLY REDIRECT IF DATA IS OK.
             // OAuth2 URL for Google
-        const OAUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?` +
-        qs.stringify({
-            client_id: '890175963480-aqtb14i2tmu2m32fr035r03knncdtout.apps.googleusercontent.com',
-            redirect_uri: 'http://localhost:3000/oauth2callback',
-            response_type: 'code',
-            scope: 'openid profile email https://www.googleapis.com/auth/drive.file',
-            access_type: 'offline',  // Request offline access for refresh token
-        });
+            const OAUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?` +
+                qs.stringify({
+                    client_id: '890175963480-aqtb14i2tmu2m32fr035r03knncdtout.apps.googleusercontent.com',
+                    redirect_uri: 'http://localhost:3000/oauth2callback',
+                    response_type: 'code',
+                    scope: 'openid profile email https://www.googleapis.com/auth/drive.file',
+                    access_type: 'offline',  // Request offline access for refresh token
+                });
             try {
                 window.location.href = OAUTH_URL;
             } catch (err) {

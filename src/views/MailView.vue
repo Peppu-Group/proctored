@@ -51,10 +51,11 @@ export default {
 
     methods: {
         async getLink() {
-            if (this.$route.params.id && this.$route.query.name) {
+            if (this.$route.params.id && this.$route.query.name && this.$route.query.email) {
                 let link = `${frontUrl}/exam/${this.$route.params.id}`;
                 let email = this.email;
                 let name = this.fullName;
+                let useremail = this.$route.query.email;
                 try {
                     Swal.showLoading();
                     const res = await axios.post(`${serverUrl}/write-sheet`, {
@@ -71,6 +72,7 @@ export default {
                                 email,
                                 link,
                                 test: this.$route.query.name,
+                                useremail,
                             });
                             // Clear form fields
                             this.fullName = '';

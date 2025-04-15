@@ -58,7 +58,8 @@ const store = createStore({
 
     actions: {
         formLink({ state }) {
-            return state.currentQuiz ? `http://127.0.0.1:5173/getmail/${state.currentQuiz.form}?name=${state.currentQuiz.name}` : '';
+            let email = localStorage.getItem('email');
+            return state.currentQuiz ? `http://127.0.0.1:5173/getmail/${state.currentQuiz.form}?name=${state.currentQuiz.name}&email=${email}` : '';
         },
 
         async initAccessToken({ commit, dispatch }) {
@@ -107,7 +108,7 @@ const store = createStore({
                     const proctoredData = res.data.data;
                     commit('setQuizList', proctoredData);
                 } catch (err) {
-                    Swal.fire("Error!", `An error occurred, could be your network connection: ${error}`, "error");
+                    // Swal.fire("We couldn't get your quiz!", `This could be because you have no quiz, or from your network connection`, "info");
                 }
             }
         },

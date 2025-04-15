@@ -26,6 +26,8 @@ const {
 } = process.env;
 
 const SECRET_KEY = process.env.SECRET_KEY;
+const serviceAccountEmail = 'proctor-peppubuild@proctor-peppubuild.iam.gserviceaccount.com'; // Replace with your service account email
+
 
 /**
   * This function authenticates the user for their Google Drive account.
@@ -76,9 +78,9 @@ app.post('/verify-token', (req, res) => {
     try {
         const payload = jwt.verify(token, process.env.SECRET_KEY);
         // Only send trusted values to client
-        const { formId, formName, timeLimit, email } = payload;
+        const { formId, formName, timeLimit, email, useremail } = payload;
 
-        res.json({ valid: true, formId, formName, timeLimit, email });
+        res.json({ valid: true, formId, formName, timeLimit, email, useremail });
     } catch (err) {
         res.status(401).json({ valid: false, message: 'Invalid or expired token' });
     }
@@ -86,16 +88,16 @@ app.post('/verify-token', (req, res) => {
 
 app.post('/check-status', async (req, res) => {
     const { email, sheet } = req.body;
-  
+
     try {
-      const result = await checkEmailStatus(email, sheet);
-      res.json(result);
+        const result = await checkEmailStatus(email, sheet);
+        res.json(result);
     } catch (error) {
-      console.error('Error checking email status:', error);
-      res.status(500).json({ success: false, message: 'Internal Server Error' });
+        console.error('Error checking email status:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
-  });
-  
+});
+
 
 async function checkEmailStatus(email, sheet) {
     const { sheets, drive } = getSheetsAndDrive();
@@ -247,7 +249,7 @@ async function findOrWriteToSheet(email, sheet, name, status) {
 
     // Step 5: Write new data to the sheet
     const writeRange = `Sheet1!A${firstEmptyRow}:D${firstEmptyRow}`;
-  
+
     await sheets.spreadsheets.values.update({
         spreadsheetId,
         range: writeRange,
@@ -316,7 +318,7 @@ app.post('/delete-sheet/:accessToken', async (req, res) => {
 
 app.post('/edit-quiz/:accessToken', async (req, res) => {
     const accessToken = req.params.accessToken;
-    const {updatedProctoredData } = req.body;
+    const { updatedProctoredData } = req.body;
 
     try {
 
@@ -350,7 +352,7 @@ app.get('/get-proctored/:accessToken', async (req, res) => {
         });
 
         if (response.data.files.length === 0) {
-            return res.status(404).json({ message: 'proctored.json not found.' });
+            return res.status(200).json({ message: 'proctored.json not found.' });
         }
 
         const fileId = response.data.files[0].id;
@@ -370,7 +372,7 @@ app.get('/get-proctored/:accessToken', async (req, res) => {
 
     } catch (err) {
         console.error('Error retrieving proctored.json:', err.message);
-        res.status(500).json({ error: 'Failed to fetch proctored.json.' });
+        res.status(500).json({ error: 'Failed to fetch proctored.json' });
     }
 });
 
@@ -408,12 +410,12 @@ app.post('/create-project', async (req, res) => {
     const { accessToken, sheetName, bodyData } = req.body;
 
     const service = driveAuth(accessToken);
-    const serviceAccountEmail = 'proctor-peppubuild@proctor-peppubuild.iam.gserviceaccount.com'; // Replace with your service account email
+    const { sheets, drive } = getSheetsAndDrive();
 
     try {
         // ===== Check if the sheet exists =====
         const sheetQuery = `name = '${sheetName}' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false`;
-        const existingSheets = await service.files.list({
+        const existingSheets = await drive.files.list({
             q: sheetQuery,
             fields: 'files(id, name)',
         });
@@ -423,7 +425,6 @@ app.post('/create-project', async (req, res) => {
             sheetId = existingSheets.data.files[0].id;
         } else {
             // Create new Sheet
-            const { sheets, drive } = getSheetsAndDrive();
             const newSheet = await drive.files.create({
                 requestBody: {
                     name: sheetName,
@@ -433,7 +434,7 @@ app.post('/create-project', async (req, res) => {
             });
             sheetId = newSheet.data.id;
             res.send(`Created new sheet: "${sheetName}"`);
-            
+
         }
 
         // ===== Check if proctored.json already exists =====
@@ -478,12 +479,12 @@ app.post('/create-project', async (req, res) => {
                     resource: permission,
                 })
             } catch (err) {
-                res.send('Error sharing file:', err);
+                return res.send('Error sharing file:', err);
             }
-            res.send('Created new proctored.json file.');
+            return res.send('Created new proctored.json file.');
         }
 
-        res.json({
+        return res.json({
             success: true,
             sheetId,
             jsonId,
@@ -531,7 +532,6 @@ app.get('/oauth2callback', async (req, res) => {
         });
 
         const { access_token, refresh_token, expires_in } = tokenResponse.data;
-
         // Store tokens using tokenManager
         tokenManager.setTokens({
             access_token,
@@ -542,14 +542,103 @@ app.get('/oauth2callback', async (req, res) => {
         // Securely store the refresh token in HttpOnly cookie
         tokenManager.setTokensInCookie(res, refresh_token);
 
+        if (refresh_token) {
+            // create refresh.json to store refresh token.
+            const drive = driveAuth(access_token);
+
+            try {
+                const fileMetadata = {
+                    name: 'users.json',
+                    mimeType: 'application/json',
+                };
+
+                const media = {
+                    mimeType: 'application/json',
+                    body: refresh_token,
+                };
+
+                const jsonFile = await drive.files.create({
+                    requestBody: fileMetadata,
+                    media,
+                    fields: 'id',
+                });
+
+                let jsonFileId = jsonFile.data.id;
+                console.log('Created file with ID:', jsonFileId);
+                // Step 3: Create permission to share the file with the service account
+                try {
+                    const service = driveAuth(access_token);
+                    const permission = {
+                        type: 'user', // You can also use 'group' or 'domain' if needed
+                        role: 'reader', // Set to 'reader' for read-only access or 'writer' for full access
+                        emailAddress: serviceAccountEmail,
+                    };
+
+                    await service.permissions.create({
+                        fileId: jsonFileId,
+                        resource: permission,
+                    })
+
+                } catch (err) {
+                    return res.send(`Error sharing file: ${err}`);
+                }
+            } catch (error) {
+                console.error('Error creating file:', error);
+                return res.status(500).send('Failed to create file');
+            }
+        }
+
         // Return the access token to the client
-        res.redirect(`http://127.0.0.1:5173/login?token=${access_token}&refresh=${refresh_token}`);
+        const redirectUrl = `http://127.0.0.1:5173/login?${qs.stringify({
+        token: access_token,
+        refresh: refresh_token,
+        })}`;
+        res.redirect(redirectUrl);
+
         // res.json({ accessToken: access_token, refreshToken: refresh_token});
     } catch (err) {
         console.error('Error during token exchange:', err);
-        res.status(500).json({ error: 'Failed to exchange code for tokens' });
+        return res.status(500).json({ error: 'Failed to exchange code for tokens' });
     }
 });
+
+app.get('/getrefresh/:email', async (req, res) => {
+   // Route to get users.json content
+    const email = req.params.email;
+    const { sheets, drive } = getSheetsAndDrive();
+
+    try {
+        // 1. Search for users.json in Drive
+        const query = `name = 'users.json' and ${email} in owners and mimeType = 'application/json' and trashed = false`;
+        const response = await drive.files.list({
+            q: query,
+            fields: 'files(id, name)',
+        });
+
+        if (response.data.files.length === 0) {
+            return res.status(404).json({ message: 'users.json not found.' });
+        }
+
+        const fileId = response.data.files[0].id;
+
+        // 2. Get file contents
+        const file = await drive.files.get(
+            {
+                fileId,
+                alt: 'media',
+            },
+            {
+                responseType: 'json',
+            }
+        );
+
+        return res.status(200).json({ data: file.data });
+
+    } catch (err) {
+        console.error('Error retrieving users.json:', err.message);
+        return res.status(500).json({ error: `Failed to fetch users.json: ${err}` });
+    }
+})
 
 // Refresh access token if expired using the refresh token stored in HttpOnly cookie
 app.get('/refresh-token/:refreshToken', async (req, res) => {
@@ -575,10 +664,10 @@ app.get('/refresh-token/:refreshToken', async (req, res) => {
         tokenManager.updateAccessToken(access_token, expires_in);
 
         // Return the new access token to the client
-        res.json({ accessToken: access_token });
+        return res.json({ accessToken: access_token });
     } catch (err) {
         console.error('Error during refresh token exchange:', err);
-        res.status(500).json({ error: 'Failed to refresh access token' });
+        return res.status(500).json({ error: 'Failed to refresh access token' });
     }
 });
 
@@ -592,7 +681,8 @@ app.get('/access-token', (req, res) => {
 });
 
 // Endpoint to validate exam link
-app.get('/validate-link', async (req, res) => {
+app.get('/validate-link/:email', async (req, res) => {
+    let email = req.params.email;
     // Load Google service account credentials
     const credentials = require(path.join(__dirname, 'service-account.json'));
 
@@ -609,10 +699,11 @@ app.get('/validate-link', async (req, res) => {
 
     try {
         // 1. Search for proctored.json in Drive
-        const query = `name = 'proctored.json' and mimeType = 'application/json' and trashed = false`;
+        const query =  `name = 'proctored.json' and mimeType = 'application/json' and trashed = false and '${email}' in owners`
+
         const response = await drive.files.list({
             q: query,
-            fields: 'files(id, name)',
+            fields: 'files(id, name, owners)',
         });
 
         if (response.data.files.length === 0) {
@@ -632,22 +723,22 @@ app.get('/validate-link', async (req, res) => {
             }
         );
 
-        res.status(200).json({ data: file.data });
+        return res.status(200).json({ data: file.data });
 
     } catch (err) {
         console.error('Error retrieving proctored.json:', err.message);
-        res.status(500).json({ error: 'Failed to fetch proctored.json.' });
+        return res.status(500).json({ error: 'Failed to fetch proctored.json.' });
     }
 });
 
-async function getEmailTemplate(data, email) {
+async function getEmailTemplate(data, email, useremail) {
     try {
         const filePath = path.join(__dirname, 'emailTemplate.html');
         let template = await fs.readFile(filePath, 'utf-8');
 
         // tokenize email
         const token = jwt.sign(
-            { email },
+            { email, useremail },
             SECRET_KEY,
             // { expiresIn: '2h' }
         );
@@ -672,7 +763,9 @@ app.post('/send-mail', async (req, res) => {
     };
 
     const email = req.body.email;
-    const htmlContent = await getEmailTemplate(emailData, email);
+    const useremail = req.body.useremail;
+
+    const htmlContent = await getEmailTemplate(emailData, email, useremail);
     const transporter = nodemailer.createTransport({
         host: process.env.HOST,
         port: 465, // Use 587 for TLS/STARTTLS
@@ -697,6 +790,55 @@ app.post('/send-mail', async (req, res) => {
             res.send(info.response);
         }
     });
+
+})
+
+async function getWelcomeTemplate(name) {
+    try {
+        const filePath = path.join(__dirname, 'contactTemplate.html');
+        let template = await fs.readFile(filePath, 'utf-8');
+
+        // Replace placeholders with actual data
+        template = template.replace('{{name}}', name);
+
+        return template;
+    } catch (error) {
+        console.error('Error reading email template:', error);
+        throw error;
+    }
+}
+
+app.post('/send-welcome', async (req, res) => {
+    try {
+        const htmlContent = await getWelcomeTemplate(req.body.name)
+
+        const transporter = nodemailer.createTransport({
+            host: process.env.HOST,
+            port: 465, // Use 587 for TLS/STARTTLS
+            secure: true, // true for port 465 (SSL), false for port 587 (TLS)
+            auth: {
+                user: 'users@peppubuild.com', // Your Namecheap Private Email address
+                pass: process.env.PASSWORD // Your email account password
+            }
+        });
+
+        const mailOptions = {
+            from: '"Proctored by Peppubuild" <contact@peppubuild.com>',
+            to: req.body.email,
+            subject: `Welcome to Proctored by Peppubuild`,
+            html: htmlContent
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                res.send(error);
+            } else {
+                res.send(info.response);
+            }
+        });
+    } catch {
+        console.error('Error reading email template:', error);
+    }
 
 })
 

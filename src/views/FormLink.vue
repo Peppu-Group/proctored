@@ -70,7 +70,8 @@ export default {
             Swal.fire("Success!", "Quiz link copied!", "success");
         },
         generateQuizLink(id, name) {
-            return id ? `${frontUrl}/getmail/${id}?name=${name}` : ''; // Returns URL if ID exists, else empty string
+            let email = localStorage.getItem('email');
+            return id ? `${frontUrl}/getmail/${id}?name=${name}&email=${email}` : ''; // Returns URL if ID exists, else empty string
         },
         async verifyToken(token) {
             try {

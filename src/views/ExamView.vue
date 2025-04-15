@@ -2,8 +2,25 @@
     <div>
         <!-- Loading message -->
         <div v-if="loading" id="loading-container">
-            <p>Loading the exam, please wait...</p>
-            <p>Don't fret, your time won't start until we load the exam</p>
+            <div class="container">
+                <div class="warning-header">
+                    <div class="warning-icon">⚠️</div>
+                    <h1 class="warning-title">Important: Close All Other Tabs</h1>
+                </div>
+
+                <div class="content">
+                    <p><strong>You may have multiple tabs or windows open.</strong></p>
+                    <p>We won't penalize you if you have multiple tabs and windows open before the exam, but we will, once
+                        you leave to another tab. Please close ALL other browser tabs and windows before continuing.</p>
+
+                    <p>Steps to prepare:</p>
+                    <ol>
+                        <li>Close all other browser tabs and windows.</li>
+                        <li>Disable any background applications that might open popups</li>
+                        <li>Turn off notifications that might distract you</li>
+                    </ol>
+                </div>
+            </div>
         </div>
 
         <!-- Exam container (hidden until iframe is ready) -->
@@ -54,6 +71,79 @@ iframe {
     font-weight: bold;
     color: #444;
 }
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5f5;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: 30px auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+.warning-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.warning-icon {
+    font-size: 38px;
+    margin-right: 15px;
+    color: #ff9800;
+}
+
+.warning-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.content {
+    text-align: left;
+}
+
+.content p {
+    margin-bottom: 15px;
+}
+
+.content strong {
+    font-weight: 600;
+}
+
+ol {
+    padding-left: 25px;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+.continue-button {
+    background-color: #4a6ee0;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.2s;
+}
+
+.continue-button:hover {
+    background-color: #3958c2;
+}
 </style>
   
 <script>
@@ -66,6 +156,7 @@ export default {
         return {
             loading: true, // Show loading until iframe is ready.
             email: null,
+            useremail: null,
             monitoringActive: false,
             userWarned: false,
             lastActiveTime: Date.now(),
@@ -88,7 +179,7 @@ export default {
         const formId = this.$route.params.id;
         await this.$store.dispatch('initAccessToken');
         try {
-            const res = await axios.get(`${serverUrl}/validate-link`);
+            const res = await axios.get(`${serverUrl}/validate-link/${this.useremail}`);
             const proctoredData = res.data.data;
             const isFound = proctoredData.find(quiz => quiz.form === formId);
             const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
@@ -115,46 +206,18 @@ export default {
                         // set Timer
                         localStorage.setItem("currentTime", isFound.time)
 
-                        Swal.fire({
-                            title: 'Important: Close All Other Tabs',
-                            html: `
-                                <div style="text-align: left">
-                                    <p><strong>You may have multiple tabs or windows open.</strong></p>
-                                    <p>We won't penalize you if you have multiple tabs and windows open before the exam, 
-                                        but we will, once you leave to another tab. Please close ALL other browser tabs and windows before continuing.</p>
-                                    <p>Steps to prepare:</p>
-                                    <ol>
-                                        <li>Close all other browser tabs and windows.</li>
-                                        <li>Disable any background applications that might open popups</li>
-                                        <li>Turn off notifications that might distract you</li>
-                                        <li>After closing all tabs, click "Continue"</li>
-                                    </ol>
-                                </div>
-                            `,
-                            icon: 'warning',
-                            showCancelButton: false,
-                            confirmButtonText: 'Continue',
-                            allowOutsideClick: false
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                this.startMonitoring();
-                            } else {
-                                // Give them another chance after delay
-                                setTimeout(() => this.showInitialSetupModal(), 3000);
-                            }
-                        });
-
                         // When the form finishes loading
-                        iframe.onload = () => {
-                            this.loading = false;
-                            document.getElementById("exam-container").style.display = "flex";
+                        iframe.addEventListener('load', () => {
+                                    this.loading = false;
+                                    document.getElementById("exam-container").style.display = "flex";
 
-                            // Set start time if not already set
-                            if (!localStorage.getItem("examStartTime")) {
-                                localStorage.setItem("examStartTime", Date.now());
-                            }
-                            this.startTimer();
-                        };
+                                    // Set start time if not already set
+                                    if (!localStorage.getItem("examStartTime")) {
+                                        localStorage.setItem("examStartTime", Date.now());
+                                    }
+                                    this.startTimer();
+                                    this.startMonitoring();
+                                });
                     } else {
                         Swal.fire("Test Unavailable!", `You have taken this test already`, "info");
                         return null;
@@ -205,6 +268,8 @@ export default {
                 if (res.data.valid) {
                     // store email in this.email, showing email is valid
                     this.email = res.data.email;
+                    // retrieve user email to make sure they're retrieving user's test.
+                    this.useremail = res.data.useremail;
                     // else send swal that they've already taken the test
                 } else {
                     Swal.fire("Error!", `We can't log you in, you seem to be using an expired link`, "error");
@@ -414,6 +479,8 @@ export default {
 
             const inactiveTime = Date.now() - this.lastActiveTime;
             // If inactive for more than 30 seconds
+            // Block off inactivity notification, to avoid distracting users
+            /* 
             if (inactiveTime > 30000 && !this.userWarned) {
                 this.userWarned = true;
                 Swal.fire({
@@ -427,6 +494,7 @@ export default {
                     this.updateUserActivity();
                 });
             }
+            */
         },
 
         // Update last active time
