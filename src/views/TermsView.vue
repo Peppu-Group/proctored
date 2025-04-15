@@ -1,4 +1,5 @@
 <template>
+    <body>
     <NavBar/>
     <div id="qtY-2" class="gjs-row">
     <div id="i5pqqi-2" class="gjs-cell">
@@ -181,7 +182,9 @@
         </div>
         <FooterView />
     </div>
-</div></template>
+</div>
+</body>
+</template>
 
 <script>
 import NavBar from '../components/NavBar.vue'

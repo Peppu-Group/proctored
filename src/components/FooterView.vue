@@ -5,15 +5,15 @@
                 <h5 id="iy9e62">Section</h5>
                 <ul id="ignf2i" class="nav flex-column">
                     <li id="iqkgvb" class="nav-item mb-2"><a href="/" id="icnr0f"
-                            class="nav-link p-0 text-body-secondary">Home</a></li>
+                            class="nav-link p-0 text-white">Home</a></li>
                     <li id="i6ttr3" class="nav-item mb-2"><a href="/pricing" id="i7xrlu"
-                            class="nav-link p-0 text-body-secondary">Pricing</a></li>
+                            class="nav-link p-0 text-white">Pricing</a></li>
                     <li id="iwilzb" class="nav-item mb-2"><a href="/contact" id="iuu0wq"
-                            class="nav-link p-0 text-body-secondary">Contact</a></li>
+                            class="nav-link p-0 text-white">Contact</a></li>
                     <li id="izoxvg" class="nav-item mb-2"><a href="/terms" id="iyzary"
-                            class="nav-link p-0 text-body-secondary">Terms</a></li>
+                            class="nav-link p-0 text-white">Terms</a></li>
                     <li id="iybitk" class="nav-item mb-2"><a href="/privacy" id="i51myt"
-                            class="nav-link p-0 text-body-secondary">Privacy</a></li>
+                            class="nav-link p-0 text-white">Privacy</a></li>
                 </ul>
             </div>
             <div id="i0qigj" class="col-md-5 offset-md-1 mb-3">

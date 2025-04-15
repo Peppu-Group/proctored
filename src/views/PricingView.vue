@@ -1,4 +1,5 @@
 <template>
+    <body>
     <NavBar />
     <div id="UXoi" class="gjs-row">
         <div id="iizvji" class="gjs-cell">
@@ -11,6 +12,7 @@
             <FooterView />
         </div>
     </div>
+</body>
 </template>
 
 <script>

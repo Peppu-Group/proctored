@@ -1,4 +1,5 @@
 <template>
+    <body>
     <div class="d-flex vh-100">
         <!-- Sidebar on the left -->
 
@@ -25,6 +26,7 @@
         </div>
 
     </div>
+</body>
 </template>
 
 <script>

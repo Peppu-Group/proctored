@@ -8,73 +8,107 @@ export default {
 </script>
 
 <template>
+  <body>
   <div id="XXe">
     <NavBar/>
-    <div class="mtop text-center mx-5 d-flex justify-content-center align-items-center flex-container">
-      <h1 id="isfg5">Proctored Peppubuild<br>Examination Reimargined.</h1>
-    </div>
-    <div class="mx-5 text-center d-flex justify-content-center align-items-center flex-container">
-      <p id="ifp58">Turn your Google Forms and Google Classroom into an examination center. Track cheating with our AI
-        feature, monitor tabs, time tests, detect cheating, and get students evaluation after test.&nbsp;</p>
-    </div>
-    <div class="m-3 d-flex justify-content-center align-items-center flex-container">
-      <div class="mx-2"><a href="#" type="button" class="btn btn-primary">Prepare your first test</a></div>
-      <div class="mx-2"><a href="/contact" type="button" class="btn btn-primary">Speak to our team</a></div>
-    </div>
-    <div class="my-3 m-5 d-flex justify-content-center align-items-center flex-container"><img
-        src="https://drive.google.com/thumbnail?id=1t6DIgaJx_cKCYKluNVpSKCS9DKoa4hZL&amp;sz=w1000" alt=""
-        class="col-10 col-sm-8 col-lg-6"></div>
-    <div class="container px-4 py-5">
-      <h2 class="pb-2 border-bottom">Features</h2>
-      <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-        <div class="col d-flex align-items-start">
-          <div
-            class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-            <img src="https://drive.google.com/thumbnail?id=1mY-n2NNxXeZiJtl3SH4A7bXas1bd_4Ri&amp;sz=w1000"
-              class="bi square">
+    <!-- Stars background -->
+  <div class="stars-background"></div>
+  
+  <div class="container">
+    <!-- Header Section -->
+    <header class="header-section">
+      <h1 class="heading-title">
+        <span>Proctored</span> <span>Peppubuild</span><br>
+        <span class="heading-subtitle">Examination Reimagined.</span>
+      </h1>
+      
+      <p class="description">
+        Turn your Google Forms and Google Classroom into an examination center. Track cheating with our AI
+        feature, monitor tabs, time tests, detect cheating, and get students evaluation after test.
+      </p>
+      
+      <div class="button-container">
+        <a href="#" class="btn btn-primary">Prepare your first test</a>
+        <a href="/contact" class="btn btn-outline">Speak to our team</a>
+      </div>
+      
+      
+      <!-- Dashboard Image -->
+      <div class="image-container">
+        <div class="image-glow"></div>
+        <img src="https://drive.google.com/thumbnail?id=1t6DIgaJx_cKCYKluNVpSKCS9DKoa4hZL&sz=w1000" alt="Peppubuild Dashboard">
+      </div>
+    </header>
+    
+    <!-- Features Section -->
+    <section class="features-section">
+      <h2 class="section-title">Features</h2>
+      
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
           </div>
-          <div>
-            <h3 class="fs-2 text-body-emphasis">Proctoring</h3>
-            <p id="i9ct7">With our AI-Powered proctoring, maintain academic honesty and prevent cheating. Peppubuild
-              offers monitoring for screen activity, webcam feeds, and user behavior in real time.</p><a href="#"
-              class="btn btn-dark">Try Now</a>
-          </div>
+          <h3 class="feature-title">Proctoring</h3>
+          <p class="feature-description">
+            With our AI-Powered proctoring, maintain academic honesty and prevent cheating. Peppubuild offers monitoring for screen activity, webcam feeds, and user behavior in real time.
+          </p>
+          <a href="#" class="btn btn-primary">Try Now</a>
         </div>
-        <div class="col d-flex align-items-start">
-          <div
-            class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-            <img src="https://drive.google.com/thumbnail?id=1mY-n2NNxXeZiJtl3SH4A7bXas1bd_4Ri&amp;sz=w1000"
-              class="bi square">
+        
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
           </div>
-          <div>
-            <h3 class="fs-2 text-body-emphasis">Timed Test</h3>
-            <p id="iyppg">Ensure fair and structured assessments.&nbsp;<span id="ihgo5e">Set strict time limits for exams,
-                keeping students focused and preventing unfair advantages. Track and save progress on Google Forms.</span>
-            </p>
-            <p data-start="212" data-end="471"></p>
-            <p></p><a href="#" class="btn btn-dark">Try Now</a>
-          </div>
+          <h3 class="feature-title">Timed Test</h3>
+          <p class="feature-description">
+            Ensure fair and structured assessments. Set strict time limits for exams, keeping students focused and preventing unfair advantages. Track and save progress on Google Forms.
+          </p>
+          <a href="#" class="btn btn-primary">Try Now</a>
         </div>
-        <div class="col d-flex align-items-start">
-          <div
-            class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-            <img src="https://drive.google.com/thumbnail?id=1mY-n2NNxXeZiJtl3SH4A7bXas1bd_4Ri&amp;sz=w1000"
-              class="bi square">
+        
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 3a2 2 0 0 0-2 2"></path>
+              <path d="M19 3a2 2 0 0 1 2 2"></path>
+              <path d="M21 19a2 2 0 0 1-2 2"></path>
+              <path d="M5 21a2 2 0 0 1-2-2"></path>
+              <path d="M9 3h1"></path>
+              <path d="M9 21h1"></path>
+              <path d="M14 3h1"></path>
+              <path d="M14 21h1"></path>
+              <path d="M3 9v1"></path>
+              <path d="M21 9v1"></path>
+              <path d="M3 14v1"></path>
+              <path d="M21 14v1"></path>
+              <line x1="7" y1="8" x2="17" y2="8"></line>
+              <line x1="7" y1="12" x2="17" y2="12"></line>
+              <line x1="7" y1="16" x2="17" y2="16"></line>
+            </svg>
           </div>
-          <div>
-            <h3 class="fs-2 text-body-emphasis">Reporting</h3>
-            <p id="icfxf">Track exam performance, detect anomalies, and ensure fairness with automated reports. Gain
-              insights into test results and trends, generate reports in multiple formats for easy review</p><a href="#"
-              class="btn btn-dark">Try Now</a>
-          </div>
+          <h3 class="feature-title">Reporting</h3>
+          <p class="feature-description">
+            Track exam performance, detect anomalies, and ensure fairness with automated reports. Gain insights into test results and trends, generate reports in multiple formats for easy review.
+          </p>
+          <a href="#" class="btn btn-primary">Try Now</a>
         </div>
       </div>
-    </div>
+    </section>
+    
     <div id="i23gh">
       <div id="accordionFlushExample" class="accordion accordion-flush container col-xxl-8 px-4 py-5">
         <h2 class="pb-2 border-bottom">Frequently Asked Questions (FAQ)</h2>
         <div class="accordion-item">
-          <h2 id="flush-headingOne" class="accordion-header"><button type="button" data-bs-toggle="collapse"
+          <h2 id="flush-headingOne" class="accordion-header header-acc"><button type="button" data-bs-toggle="collapse"
               data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne"
               class="accordion-button collapsed">Why Use Proctored by Peppubuild</button></h2>
           <div id="flush-collapseOne" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample"
@@ -159,7 +193,13 @@ export default {
           </div>
         </div>
       </div>
+      </div>
     </div>
     <FooterView/>
 </div>
+</body>
 </template>
+
+<style scoped>
+
+</style>
