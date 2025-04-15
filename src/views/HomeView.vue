@@ -8,7 +8,7 @@ export default {
 </script>
 
 <template>
-  <body>
+  <body class="bod">
   <div id="XXe">
     <NavBar/>
     <!-- Stars background -->
@@ -201,12 +201,5 @@ export default {
 </template>
 
 <style scoped>
-body {
-  font-family: 'Inter', 'Roboto', 'Arial', sans-serif;
-  color: #fff;
-  overflow-x: hidden;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  position: relative;
-  min-height: 100vh;
-}
+
 </style>
