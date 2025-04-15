@@ -119,7 +119,22 @@ const store = createStore({
 
             if (!Array.isArray(parsedQuizDetails)) parsedQuizDetails = [];
 
-            const isDuplicate = parsedQuizDetails.some(q => q.form === quizData.form);
+            // Validate that quizData.name is not empty or just whitespace
+            if (!quizData.name || quizData.name.trim().length === 0) {
+                Swal.fire('Missing Name', 'Please, only named forms are accepted. Name your form.', 'warning');
+                return;
+            }
+
+            // Check for duplicates based on form ID or quiz name (case-insensitive)
+            const isDuplicate = parsedQuizDetails.some(q =>
+                q.form === quizData.form || q.name.trim().toLowerCase() === quizData.name.trim().toLowerCase()
+            );
+            
+            if (isDuplicate) {
+                Swal.fire('Duplicate Found!', 'A quiz with this form ID or name already exists. Please edit the existing quiz or choose a different form.', 'info');
+                return;
+            }
+            
             if (!isDuplicate) {
                 parsedQuizDetails.push(quizData);
                 commit('setQuizList', parsedQuizDetails);
