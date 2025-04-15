@@ -4,121 +4,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Peppubuild - Examination Reimagined</title>
+  <title>Proctored Peppubuild Pricing</title>
+  <!-- Include Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Slider CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'space-dark': '#111827',
+            'space-darker': '#0F172A',
+            'space-blue': '#3b82f6',
+            'space-indigo': '#6366f1',
+            'space-cyan': '#a5f3fc',
+          },
+          backgroundImage: {
+            'stars-pattern': "radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)), radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0))",
+            'space-gradient': 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
+          },
+          animation: {
+            'stars': 'animateStars 100s linear infinite',
+          },
+          keyframes: {
+            'animateStars': {
+              from: { backgroundPosition: '0 0' },
+              to: { backgroundPosition: '0 1000px' }
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    /* Base styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
     body {
-      font-family: 'Inter', 'Roboto', 'Arial', sans-serif;
-      color: #fff;
-      overflow-x: hidden;
-      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-      position: relative;
-      min-height: 100vh;
+      background-color: #111827;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Stars background */
-    .stars-background {
-      position: fixed;
+    .text-gradient {
+      background: linear-gradient(120deg, #a5f3fc, #3b82f6, #6366f1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .stars {
+      position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
-      background-repeat: repeat;
-      background-size: 200px 200px;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)), 
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)), 
+                radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)), 
+                radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)), 
+                radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)), 
+                radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
       animation: animateStars 100s linear infinite;
       opacity: 0.3;
       z-index: -1;
     }
     
     @keyframes animateStars {
-      from {
-        background-position: 0 0;
-      }
-      to {
-        background-position: 0 1000px;
-      }
+      from { background-position: 0 0; }
+      to { background-position: 0 1000px; }
     }
     
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
+    .card {
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+      border: 1px solid #374151;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      transition: all 0.3s;
       position: relative;
-      z-index: 1;
+      overflow: hidden;
     }
     
-    /* Header styles */
-    .header-section {
-      padding: 4rem 0;
-      text-align: center;
+    .card:hover {
+      border-color: rgba(99, 102, 241, 0.5);
+      transform: translateY(-4px);
     }
     
-    .heading-title {
-      font-size: 3.5rem;
-      font-weight: 800;
-      margin-bottom: 1.5rem;
-      line-height: 1.2;
+    .card-highlight::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, #3b82f6, #6366f1);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
     }
     
-    .heading-title span {
-      display: inline-block;
-      animation: float 6s ease-in-out infinite;
-    }
-    
-    .heading-title span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    
-    .heading-subtitle {
-      background: linear-gradient(120deg, #a5f3fc, #3b82f6, #6366f1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: 800;
-    }
-    
-    .description {
-      max-width: 800px;
-      margin: 0 auto;
-      font-size: 1.125rem;
-      line-height: 1.6;
-      margin-bottom: 2rem;
-      color: #e5e7eb;
-    }
-    
-    /* Button styles */
-    .button-container {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin: 2rem 0;
-      flex-wrap: wrap;
+    .card:hover .card-highlight::before {
+      transform: scaleX(1);
     }
     
     .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
       font-weight: 600;
-      font-size: 1rem;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s;
       display: inline-block;
-      text-decoration: none;
-      border: none;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
     
     .btn-primary {
@@ -127,531 +122,375 @@
     }
     
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 10px -1px rgba(59, 130, 246, 0.4);
+      opacity: 0.9;
     }
     
     .btn-outline {
-      background-color: transparent;
-      color: #e5e7eb;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
     }
     
     .btn-outline:hover {
       background-color: rgba(255, 255, 255, 0.1);
     }
     
-    /* Image container */
-    .image-container {
-      margin: 3rem auto;
-      text-align: center;
-      max-width: 1000px;
-      position: relative;
-    }
-    
-    .image-container img {
-      width: 100%;
-      max-width: 800px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      position: relative;
-      z-index: 1;
-    }
-    
-    .image-glow {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2));
-      filter: blur(30px);
-      border-radius: 12px;
-      z-index: 0;
-    }
-    
-    /* Features section */
-    .features-section {
-      padding: 4rem 0;
-    }
-    
-    .section-title {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      background: linear-gradient(to right, #a5f3fc, #6366f1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-    
-    .feature-card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 1.5rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .feature-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
-      background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
-    }
-    
-    .feature-icon {
-      background: #111827;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-    }
-    
-    .feature-icon svg {
-      width: 30px;
-      height: 30px;
-      color: #3b82f6;
-    }
-    
-    .feature-title {
-      font-size: 1.5rem;
-      margin-bottom: 0.75rem;
-      color: white;
-    }
-    
-    .feature-description {
-      color: #e5e7eb;
-      margin-bottom: 1.5rem;
-      flex-grow: 1;
-      line-height: 1.6;
-    }
-    
-    /* FAQ Section */
-    .faq-section {
-      padding: 4rem 0;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    
-    .accordion {
-      background: rgba(17, 24, 39, 0.7);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      overflow: hidden;
-    }
-    
-    .accordion-item {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .accordion-item:last-child {
-      border-bottom: none;
-    }
-    
-    .accordion-button {
-      background: transparent;
-      color: white;
-      font-size: 1.125rem;
-      font-weight: 600;
-      padding: 1.25rem;
-      width: 100%;
-      text-align: left;
-      border: none;
+    .tab {
+      padding: 0.5rem 1rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: background-color 0.3s;
+      border-radius: 0.25rem;
+      font-weight: 500;
     }
     
-    .accordion-button:hover {
-      background-color: rgba(255, 255, 255, 0.05);
+    .tab.active {
+      background-color: rgba(255, 255, 255, 0.1);
     }
     
-    .accordion-button::after {
-      content: "+";
-      font-size: 1.5rem;
-      color: #3b82f6;
+    .tabs {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 0.5rem;
+      padding: 0.25rem;
+      display: inline-flex;
+      backdrop-filter: blur(8px);
     }
     
-    .accordion-button[aria-expanded="true"]::after {
-      content: "-";
+    .noUi-target {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      box-shadow: none;
+      height: 8px;
+      border-radius: 4px;
     }
     
-    .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-      padding: 0 1.25rem;
+    .noUi-connect {
+      background: linear-gradient(to right, #3b82f6, #6366f1);
     }
     
-    .accordion-content-inner {
-      padding-bottom: 1.25rem;
-      color: #e5e7eb;
-      line-height: 1.6;
-    }
-    
-    .accordion-content.active {
-      max-height: 1000px;
-    }
-    
-    /* Space traveler animation */
-    .space-traveler {
-      height: 100px;
-      width: 100%;
-      position: relative;
-      margin: 2rem 0;
-    }
-    
-    .astronaut {
-      position: absolute;
-      width: 60px;
-      height: 90px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation: float-astronaut 10s ease-in-out infinite;
-    }
-    
-    @keyframes float-astronaut {
-      0%, 100% {
-        transform: translateX(-50%) translateY(0) rotate(3deg);
-      }
-      25% {
-        transform: translateX(-30%) translateY(-15px) rotate(-5deg);
-      }
-      50% {
-        transform: translateX(-50%) translateY(-25px) rotate(0deg);
-      }
-      75% {
-        transform: translateX(-70%) translateY(-15px) rotate(5deg);
-      }
-    }
-    
-    .astronaut-helmet {
-      position: absolute;
-      top: 0;
-      left: 15px;
-      width: 30px;
-      height: 30px;
-      background: #fff;
+    .noUi-handle {
+      width: 20px !important;
+      height: 20px !important;
       border-radius: 50%;
-      box-shadow: 0 0 10px rgba(165, 243, 252, 0.7);
+      background-color: white;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      border: 2px solid #3b82f6;
     }
     
-    .astronaut-body {
-      position: absolute;
-      top: 25px;
-      left: 10px;
-      width: 40px;
-      height: 45px;
-      background: #e5e7eb;
-      border-radius: 10px;
-    }
-    
-    .astronaut-arm {
-      position: absolute;
-      width: 10px;
-      height: 30px;
-      background: #e5e7eb;
-      border-radius: 5px;
-    }
-    
-    .astronaut-arm.left {
-      top: 28px;
-      left: 2px;
-      transform: rotate(20deg);
-    }
-    
-    .astronaut-arm.right {
-      top: 28px;
-      right: 2px;
-      transform: rotate(-20deg);
-    }
-    
-    .astronaut-leg {
-      position: absolute;
-      width: 10px;
-      height: 20px;
-      background: #e5e7eb;
-      border-radius: 5px;
-      bottom: 0;
-    }
-    
-    .astronaut-leg.left {
-      left: 17px;
-    }
-    
-    .astronaut-leg.right {
-      right: 17px;
-    }
-    
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 2rem 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 2rem;
-    }
-    
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      margin-top: 1rem;
-    }
-    
-    .footer-links a {
-      color: #a5b4fc;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    
-    .footer-links a:hover {
-      color: #6366f1;
-    }
-    
-    /* Animation */
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-20px);
-      }
-    }
-    
-    /* Responsive styles */
-    @media (max-width: 768px) {
-      .heading-title {
-        font-size: 2.5rem;
-      }
-      
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .button-container {
-        flex-direction: column;
-        align-items: center;
-      }
-      
-      .btn {
-        width: 100%;
-        max-width: 300px;
-      }
-    }
-    
-    .check-icon {
-      color: #10b981;
-      margin-right: 8px;
-    }
-    
-    .emoji {
-      font-style: normal;
-      margin-right: 8px;
+    .noUi-handle:before,
+    .noUi-handle:after {
+      display: none;
     }
   </style>
 </head>
-<body>
+<body class="min-h-screen w-full overflow-x-hidden">
   <!-- Stars background -->
-  <div class="stars-background"></div>
+  <div class="stars"></div>
   
-  <div class="container">
-    <!-- Header Section -->
-    <header class="header-section">
-      <h1 class="heading-title">
-        <span>Proctored</span> <span>Peppubuild</span><br>
-        <span class="heading-subtitle">Examination Reimagined.</span>
+  <div class="container mx-auto px-4 py-16 relative z-10">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 text-gradient">
+        Proctored Peppubuild Pricing
       </h1>
-      
-      <p class="description">
-        Turn your Google Forms and Google Classroom into an examination center. Track cheating with our AI
-        feature, monitor tabs, time tests, detect cheating, and get students evaluation after test.
+      <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+        Turn your Google Forms and Google Classroom into an examination center at an affordable price
       </p>
-      
-      <div class="button-container">
-        <a href="#" class="btn btn-primary">Prepare your first test</a>
-        <a href="/contact" class="btn btn-outline">Speak to our team</a>
-      </div>
-      
-      
-      <!-- Dashboard Image -->
-      <div class="image-container">
-        <div class="image-glow"></div>
-        <img src="https://drive.google.com/thumbnail?id=1t6DIgaJx_cKCYKluNVpSKCS9DKoa4hZL&sz=w1000" alt="Peppubuild Dashboard">
-      </div>
-    </header>
+    </div>
     
-    <!-- Features Section -->
-    <section class="features-section">
-      <h2 class="section-title">Features</h2>
-      
-      <div class="features-grid">
-        <!-- Feature 1 -->
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-          </div>
-          <h3 class="feature-title">Proctoring</h3>
-          <p class="feature-description">
-            With our AI-Powered proctoring, maintain academic honesty and prevent cheating. Peppubuild offers monitoring for screen activity, webcam feeds, and user behavior in real time.
-          </p>
-          <a href="#" class="btn btn-primary">Try Now</a>
-        </div>
-        
-        <!-- Feature 2 -->
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
-          <h3 class="feature-title">Timed Test</h3>
-          <p class="feature-description">
-            Ensure fair and structured assessments. Set strict time limits for exams, keeping students focused and preventing unfair advantages. Track and save progress on Google Forms.
-          </p>
-          <a href="#" class="btn btn-primary">Try Now</a>
-        </div>
-        
-        <!-- Feature 3 -->
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 3a2 2 0 0 0-2 2"></path>
-              <path d="M19 3a2 2 0 0 1 2 2"></path>
-              <path d="M21 19a2 2 0 0 1-2 2"></path>
-              <path d="M5 21a2 2 0 0 1-2-2"></path>
-              <path d="M9 3h1"></path>
-              <path d="M9 21h1"></path>
-              <path d="M14 3h1"></path>
-              <path d="M14 21h1"></path>
-              <path d="M3 9v1"></path>
-              <path d="M21 9v1"></path>
-              <path d="M3 14v1"></path>
-              <path d="M21 14v1"></path>
-              <line x1="7" y1="8" x2="17" y2="8"></line>
-              <line x1="7" y1="12" x2="17" y2="12"></line>
-              <line x1="7" y1="16" x2="17" y2="16"></line>
-            </svg>
-          </div>
-          <h3 class="feature-title">Reporting</h3>
-          <p class="feature-description">
-            Track exam performance, detect anomalies, and ensure fairness with automated reports. Gain insights into test results and trends, generate reports in multiple formats for easy review.
-          </p>
-          <a href="#" class="btn btn-primary">Try Now</a>
+    <!-- Pricing tabs -->
+    <div class="max-w-3xl mx-auto mb-12">
+      <div class="text-center mb-8">
+        <div class="tabs">
+          <div class="tab active" id="tab-monthly">Monthly</div>
+          <div class="tab" id="tab-yearly">Yearly <span class="ml-1.5 rounded-full bg-primary/20 px-2 py-0.5 text-xs">Save 20%</span></div>
         </div>
       </div>
-    </section>
+      
+      <div class="flex flex-col items-center mb-8">
+        <label class="text-lg mb-2">Number of Exams: <span id="exam-count">1</span></label>
+        <div class="w-full max-w-md">
+          <div id="slider" class="my-4"></div>
+          <div class="flex justify-between text-sm text-gray-400 px-2">
+            <span>1</span>
+            <span>25</span>
+            <span>50</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Pricing cards -->
+    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <!-- Free Plan -->
+      <div class="card group">
+        <div class="card-highlight"></div>
+        <h3 class="text-xl font-medium mb-2">Free Trial</h3>
+        <p class="text-gray-400 text-sm mb-6">Get started with our 7-day trial</p>
+        <div class="flex items-baseline mb-8">
+          <span class="text-4xl font-bold">$0</span>
+          <span class="text-gray-400 ml-2">/ 7 days</span>
+        </div>
+        
+        <ul class="space-y-3 mb-8">
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">1 published test</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Up to 10 students</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Basic proctoring features</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">7 days access</span>
+          </li>
+        </ul>
+        
+        <button class="btn btn-primary w-full">Start Free Trial</button>
+      </div>
+      
+      <!-- Standard Plan -->
+      <div class="card group transform hover:-translate-y-1 md:scale-105">
+        <div class="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold py-1.5 px-3 rounded-bl-lg" style="background: #3b82f6; color: white;">
+          POPULAR
+        </div>
+        <div class="card-highlight"></div>
+        <h3 class="text-xl font-medium mb-2">Standard</h3>
+        <p class="text-gray-400 text-sm mb-6">For educators and small teams</p>
+        <div class="flex items-baseline mb-8">
+          <span class="text-4xl font-bold" id="price">$10</span>
+          <span class="text-gray-400 ml-2" id="period">/ month</span>
+        </div>
+        
+        <ul class="space-y-3 mb-8">
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm" id="exam-text">1 exam</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Unlimited students</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Advanced proctoring</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Basic reporting & analytics</span>
+          </li>
+          <li class="flex" id="yearly-savings" style="display:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm text-blue-400" id="savings-text">Save $20 yearly</span>
+          </li>
+        </ul>
+        
+        <button class="btn btn-primary w-full">Get Started</button>
+      </div>
+      
+      <!-- Premium Plan -->
+      <div class="card group">
+        <div class="card-highlight"></div>
+        <h3 class="text-xl font-medium mb-2">Enterprise</h3>
+        <p class="text-gray-400 text-sm mb-6">For institutions & large teams</p>
+        <div class="flex items-baseline mb-8">
+          <span class="text-4xl font-bold">Custom</span>
+        </div>
+        
+        <ul class="space-y-3 mb-8">
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Unlimited exams</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Unlimited students</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Premium AI-powered proctoring</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Advanced reporting & analytics</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Dedicated support team</span>
+          </li>
+        </ul>
+        
+        <button class="btn btn-outline w-full">Contact Sales</button>
+      </div>
+    </div>
     
     <!-- FAQ Section -->
-    <section class="faq-section">
-      <h2 class="section-title">Frequently Asked Questions (FAQ)</h2>
+    <div class="max-w-4xl mx-auto mt-24">
+      <h2 class="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
       
-      <div class="accordion">
-        <!-- FAQ Item 1 -->
-        <div class="accordion-item">
-          <button class="accordion-button" aria-expanded="false" onclick="toggleAccordion(this)">
-            Why Use Proctored by Peppubuild
-          </button>
-          <div class="accordion-content">
-            <div class="accordion-content-inner">
-              <p>Turn your <strong>Google Form</strong> into a fully monitored <strong>exam environment</strong> with ease! <strong>Proctored by Peppubuild</strong> ensures a secure, fair, and data-driven testing experience for both educators and students.</p>
-              <p>
-                <span class="check-icon">✅</span> <strong>Seamless Google Forms Integration</strong> – No need for complicated setups; just connect and start monitoring. Setup tests with our AI guide on Google Forms.<br>
-                <span class="check-icon">✅</span> <strong>Affordable Pricing</strong> – Enjoy high-quality proctoring at a fraction of the cost of traditional solutions.<br>
-                <span class="check-icon">✅</span> <strong>Cancel Anytime</strong> – No long-term commitments; adjust or cancel your plan whenever you need.<br>
-                <span class="check-icon">✅</span> <strong>Advanced Reporting & Analytics</strong> – Get <strong>detailed insights</strong> into each student's performance, including strengths, weaknesses, and potential red flags.<br>
-                <span class="check-icon">✅</span> <strong>Student Ranking</strong> – Easily compare performance across students with automatic ranking based on test scores.
-              </p>
-              <p>
-                <span class="emoji">📊</span> <strong>Make better decisions, ensure fairness, and optimize learning outcomes with Proctored by Peppubuild!</strong>
-              </p>
-            </div>
-          </div>
+      <div class="space-y-6">
+        <div class="card">
+          <h3 class="text-xl font-medium mb-2">What is included in the free trial?</h3>
+          <p class="text-gray-300">
+            Our 7-day free trial gives you access to all features including proctoring, monitoring, reporting, 
+            and analytics. You can create and publish one monitored exam for up to 10 students.
+          </p>
         </div>
         
-        <!-- FAQ Item 2 -->
-        <div class="accordion-item">
-          <button class="accordion-button" aria-expanded="false" onclick="toggleAccordion(this)">
-            What Monitoring do you Provide
-          </button>
-          <div class="accordion-content">
-            <div class="accordion-content-inner">
-              <p><strong>Proctored by Peppubuild</strong> ensures exam integrity with <strong>comprehensive monitoring features</strong> that detect and prevent cheating in real time.</p>
-              <p>
-                <span class="check-icon">✅</span> <strong>Screen Monitoring</strong> – Track student activity to prevent switching tabs or using unauthorized resources.<br>
-                <span class="check-icon">✅</span> <strong>Camera Surveillance</strong> – Capture live webcam feeds to verify student identity and detect suspicious movements.<br>
-                <span class="check-icon">✅</span> <strong>Audio Detection</strong> – Identify background noise or external assistance during the exam.<br>
-                <span class="check-icon">✅</span> <strong>Auto Recording & Storage</strong> – Save exam sessions for later review and auditing.<br>
-                <span class="check-icon">✅</span> <strong>AI-Powered Anomaly Detection</strong> – Get alerts for unusual behaviors like multiple faces, distractions, or extended inactivity.
-              </p>
-              <p>
-                With <strong>Proctored by Peppubuild</strong>, you get <strong>full control and transparency</strong>, ensuring <strong>fair, distraction-free exams</strong> every time!
-              </p>
-            </div>
-          </div>
+        <div class="card">
+          <h3 class="text-xl font-medium mb-2">Can I change my plan later?</h3>
+          <p class="text-gray-300">
+            Yes! You can upgrade, downgrade, or cancel your plan at any time. If you upgrade, 
+            your new features will be available immediately. If you downgrade, the changes will take effect at the end of your billing cycle.
+          </p>
         </div>
         
-        <!-- FAQ Item 3 -->
-        <div class="accordion-item">
-          <button class="accordion-button" aria-expanded="false" onclick="toggleAccordion(this)">
-            What Features does the Free Plan Offer
-          </button>
-          <div class="accordion-content">
-            <div class="accordion-content-inner">
-              <p>Our <strong>7-day free plan</strong> gives you access to <strong>all features</strong> so you can experience <strong>Proctored by Peppubuild</strong> without limitations! However, there are some usage restrictions:</p>
-              <p>
-                <span class="check-icon">✅</span> <strong>Full Feature Access</strong> – Enjoy proctoring, monitoring, reporting, and analytics for 7 days.<br>
-                <span class="check-icon">✅</span> <strong>One Published Test</strong> – Create and launch <strong>one</strong> monitored exam.<br>
-                <span class="check-icon">✅</span> <strong>Up to 10 Students</strong> – Conduct exams for a maximum of <strong>10 test-takers</strong>.<br>
-                <span class="check-icon">✅</span> <strong>Unlimited Demo Forms</strong> – Test the system as much as you want before going live.
-              </p>
-              <p>
-                <span class="emoji">🔔</span> <strong>Upgrade for More!</strong> After 7 days, your <strong>feature access will be revoked</strong> unless you upgrade to a paid plan. Unlock <strong>more tests, unlimited students, and advanced monitoring</strong> with our affordable plans!
-              </p>
-            </div>
-          </div>
+        <div class="card">
+          <h3 class="text-xl font-medium mb-2">What payment methods do you accept?</h3>
+          <p class="text-gray-300">
+            We accept all major credit cards, PayPal, and bank transfers for annual plans. 
+            Enterprise customers may also pay by invoice.
+          </p>
+        </div>
+        
+        <div class="card">
+          <h3 class="text-xl font-medium mb-2">How does the exam pricing work?</h3>
+          <p class="text-gray-300">
+            Our pricing is based on the number of exams you need to administer. Each exam can have an unlimited 
+            number of students taking it. The more exams you purchase, the lower the price per exam.
+          </p>
         </div>
       </div>
-    </section>
+    </div>
     
-    <!-- Footer -->
-    <footer>
-      <p>© <script>document.write(new Date().getFullYear())</script> Peppubuild. All rights reserved.</p>
-      <div class="footer-links">
-        <a href="#">Terms</a>
-        <a href="#">Privacy</a>
-        <a href="#">Contact</a>
+    <!-- Call to action -->
+    <div class="relative mt-24 max-w-5xl mx-auto p-8 md:p-12 rounded-xl overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-space-blue/40 to-space-indigo/40 backdrop-blur-xl"></div>
+      <div class="relative z-10 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to transform your examination process?</h2>
+        <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+          Start your free trial today and experience the future of online proctoring with Peppubuild.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button class="btn btn-primary">Start Free Trial</button>
+          <button class="btn btn-outline">Schedule a Demo</button>
+        </div>
       </div>
-    </footer>
+    </div>
   </div>
   
+  <!-- Include NoUiSlider.js (slider library) -->
+  <script src="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js"></script>
   <script>
-    function toggleAccordion(button) {
-      const expanded = button.getAttribute('aria-expanded') === 'true';
-      button.setAttribute('aria-expanded', !expanded);
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize variables
+      let examCount = 1;
+      let billingPeriod = 'monthly';
       
-      const content = button.nextElementSibling;
-      if (!expanded) {
-        content.classList.add('active');
-      } else {
-        content.classList.remove('active');
+      // Initialize slider
+      const slider = document.getElementById('slider');
+      noUiSlider.create(slider, {
+        start: [1],
+        connect: [true, false],
+        step: 1,
+        range: {
+          'min': 1,
+          'max': 50
+        }
+      });
+      
+      // Slider event listener
+      slider.noUiSlider.on('update', function(values) {
+        examCount = Math.round(parseFloat(values[0]));
+        document.getElementById('exam-count').textContent = examCount;
+        updatePrice();
+      });
+      
+      // Tab switching
+      const tabMonthly = document.getElementById('tab-monthly');
+      const tabYearly = document.getElementById('tab-yearly');
+      const yearlySavings = document.getElementById('yearly-savings');
+      
+      tabMonthly.addEventListener('click', function() {
+        tabMonthly.classList.add('active');
+        tabYearly.classList.remove('active');
+        billingPeriod = 'monthly';
+        yearlySavings.style.display = 'none';
+        updatePrice();
+      });
+      
+      tabYearly.addEventListener('click', function() {
+        tabYearly.classList.add('active');
+        tabMonthly.classList.remove('active');
+        billingPeriod = 'yearly';
+        yearlySavings.style.display = 'flex';
+        updatePrice();
+      });
+      
+      // Price calculation
+      function getBasePricePerExam() {
+        if (examCount <= 5) return 10;
+        if (examCount <= 20) return 8;
+        return 6;
       }
-    }
+      
+      function getPrice() {
+        const basePrice = getBasePricePerExam() * examCount;
+        return billingPeriod === 'yearly' ? basePrice * 10 : basePrice;
+      }
+      
+      function getSavings() {
+        if (billingPeriod === 'yearly') {
+          return getBasePricePerExam() * examCount * 2;
+        }
+        return 0;
+      }
+      
+      function updatePrice() {
+        const price = document.getElementById('price');
+        const period = document.getElementById('period');
+        const examText = document.getElementById('exam-text');
+        const savingsText = document.getElementById('savings-text');
+        
+        price.textContent = '$' + getPrice();
+        period.textContent = billingPeriod === 'monthly' ? '/ month' : '/ year';
+        examText.textContent = examCount === 1 ? '1 exam' : `${examCount} exams`;
+        savingsText.textContent = `Save $${getSavings()} yearly`;
+      }
+      
+      // Initialize price
+      updatePrice();
+    });
   </script>
 </body>
 </html>
