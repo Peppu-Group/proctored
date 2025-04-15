@@ -589,7 +589,7 @@ app.get('/oauth2callback', async (req, res) => {
         }
 
         // Return the access token to the client
-        const redirectUrl = `http://127.0.0.1:5173/login?${qs.stringify({
+        const redirectUrl = `https://proctored.peppubuild.com/login?${qs.stringify({
         token: access_token,
         refresh: refresh_token,
         })}`;

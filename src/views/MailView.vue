@@ -30,8 +30,8 @@
 <script>
 import SideBar from '../components/SideBar.vue';
 import axios from 'axios';
-const serverUrl = `http://localhost:3000`;
-const frontUrl = `http://127.0.0.1:5173`;
+const serverUrl = `https://proctored.server.peppubuild.com`;
+const frontUrl = `https://proctored.peppubuild.com`;
 
 export default {
     name: 'MailView',

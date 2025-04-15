@@ -37,7 +37,7 @@
 
 <script>
 import axios from 'axios';
-const serverUrl = `http://localhost:3000`;
+const serverUrl = `https://proctored.server.peppubuild.com`;
 import { createQuiz } from '@/utils/swalQuiz';
 
 
