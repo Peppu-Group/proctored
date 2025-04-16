@@ -632,7 +632,7 @@ app.get('/getrefresh/:email', async (req, res) => {
             }
         );
 
-        return res.status(200).json({ data: file.data });
+        return res.status(200).send(file.data);
 
     } catch (err) {
         console.error('Error retrieving users.json:', err.message);

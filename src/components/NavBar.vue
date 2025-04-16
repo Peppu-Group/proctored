@@ -8,7 +8,7 @@
           <ul id="ixp3j" class="navbar-nav me-auto mb-2 mb-lg-0">
             <li id="i3bzx" class="nav-item"><a aria-current="page" href="/" id="i5k3z" class="nav-link active">Home</a>
             </li>
-            <li id="ipg0l" class="nav-item"><a aria-current="page" href="/pricing" id="iak5w-2"
+            <li id="ipg0l" class="nav-item"><a aria-current="page" href="/pricing.html" id="iak5w-2"
                 class="nav-link">Pricing</a></li><a aria-current="page" href="/contact" id="iak5w-2-6"
               class="nav-link">Contact</a>
               <a aria-current="page" href="/app" id="iak5w-2-6"
