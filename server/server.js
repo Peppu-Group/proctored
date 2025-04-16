@@ -609,10 +609,10 @@ app.get('/getrefresh/:email', async (req, res) => {
 
     try {
         // 1. Search for users.json in Drive
-        const query = `name = 'users.json' and ${email} in owners and mimeType = 'application/json' and trashed = false`;
+        const query = `name = 'users.json' and mimeType = 'application/json' and trashed = false and '${email}' in owners`;
         const response = await drive.files.list({
             q: query,
-            fields: 'files(id, name)',
+            fields: 'files(id, name, owners)',
         });
 
         if (response.data.files.length === 0) {
@@ -628,7 +628,7 @@ app.get('/getrefresh/:email', async (req, res) => {
                 alt: 'media',
             },
             {
-                responseType: 'json',
+                responseType: 'text',
             }
         );
 

@@ -91,7 +91,6 @@ const store = createStore({
                     Swal.fire('An error occurred', `Failed to refresh access token: ${err}`, 'error');
                 }
             } else {
-                // do something to remove access to peppubuild so that the user will get accessToken and clear accessToken
                 // fetch refreshtoken from json file.
                 console.log('blah')
             }
@@ -121,7 +120,7 @@ const store = createStore({
 
             // Validate that quizData.name is not empty or just whitespace
             if (!quizData.name || quizData.name.trim().length === 0) {
-                Swal.fire('Missing Name', 'Please, only named forms are accepted. Name your form.', 'warning');
+                Swal.fire('Missing Name', 'Please, only named forms are accepted. Name your form before adding them to your dashboard.', 'warning');
                 return;
             }
 
@@ -134,7 +133,7 @@ const store = createStore({
                 Swal.fire('Duplicate Found!', 'A quiz with this form ID or name already exists. Please edit the existing quiz or choose a different form.', 'info');
                 return;
             }
-            
+
             if (!isDuplicate) {
                 parsedQuizDetails.push(quizData);
                 commit('setQuizList', parsedQuizDetails);

@@ -15,9 +15,12 @@
                     <a class="text-decoration-none">Change settings from the sidebar</a>
                 </p>
                 <div class="input-group my-3">
-                    <input type="text" class="form-control text-center" :value="generateQuizLink(currentQuiz?.form || '', currentQuiz?.name || '')" readonly>
-                    <button class="btn btn-primary" @click="copyLink(currentQuiz?.form || '', currentQuiz?.name || '')">Copy</button>
-                    <a :href="generateQuizLink(currentQuiz?.form || '', currentQuiz?.name || '')"><i class="bi bi-box-arrow-up-right bicon"></i></a>
+                    <input type="text" class="form-control text-center"
+                        :value="generateQuizLink(currentQuiz?.form || '', currentQuiz?.name || '')" readonly>
+                    <button class="btn btn-primary"
+                        @click="copyLink(currentQuiz?.form || '', currentQuiz?.name || '')">Copy</button>
+                    <a :href="generateQuizLink(currentQuiz?.form || '', currentQuiz?.name || '')"><i
+                            class="bi bi-box-arrow-up-right bicon"></i></a>
                 </div>
                 <p class="text-muted">
                     You have <strong>{{ 5 - quizLength }} free tests</strong> left.
@@ -45,7 +48,7 @@ export default {
             return this.$store.getters.quizLength;
         }
     },
-    
+
 
     mounted() {
         if (this.$route.query.token) {
@@ -65,13 +68,17 @@ export default {
 
     methods: {
         copyLink(id, name) {
-            let formLink =  this.generateQuizLink(id, name);
+            let formLink = this.generateQuizLink(id, name);
             navigator.clipboard.writeText(`${formLink}`);
             Swal.fire("Success!", "Quiz link copied!", "success");
         },
         generateQuizLink(id, name) {
-            let email = localStorage.getItem('email');
-            return id ? `${frontUrl}/getmail/${id}?name=${name}&email=${email}` : ''; // Returns URL if ID exists, else empty string
+            if (id && name) {
+                let email = localStorage.getItem('email');
+                return id ? `${frontUrl}/getmail/${id}?name=${name}&email=${email}` : ''; // Returns URL if ID exists, else empty string
+            } else {
+                return '';
+            }
         },
         async verifyToken(token) {
             try {
@@ -157,5 +164,4 @@ export default {
 .bicon {
     font-size: 2em;
     margin-left: 10px;
-}
-</style>
+}</style>
