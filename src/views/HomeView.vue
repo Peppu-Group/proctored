@@ -110,10 +110,10 @@ export default {
         <div class="accordion-item">
           <h2 id="flush-headingOne" class="accordion-header header-acc"><button type="button" data-bs-toggle="collapse"
               data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne"
-              class="accordion-button collapsed">Why Use Proctored by Peppubuild</button></h2>
+              class="accordion-button collapsed whitefont">Why Use Proctored by Peppubuild</button></h2>
           <div id="flush-collapseOne" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample"
             class="accordion-collapse collapse">
-            <div class="accordion-body">
+            <div class="accordion-body whitefont">
               <p data-start="49" data-end="251">Turn your <strong data-start="59" data-end="74">Google Form</strong> into
                 a fully monitored <strong data-start="98" data-end="118">exam environment</strong> with ease! <strong
                   data-start="130" data-end="157">Proctored by Peppubuild</strong> ensures a secure, fair, and data-driven
@@ -138,10 +138,10 @@ export default {
         <div class="accordion-item">
           <h2 id="flush-headingTwo" class="accordion-header"><button type="button" data-bs-toggle="collapse"
               data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo"
-              class="accordion-button collapsed">What Monitoring do you Provide</button></h2>
+              class="accordion-button collapsed whitefont">What Monitoring do you Provide</button></h2>
           <div id="flush-collapseTwo" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample"
             class="accordion-collapse collapse">
-            <div class="accordion-body">
+            <div class="accordion-body whitefont">
               <p data-start="48" data-end="190"><strong data-start="48" data-end="75">Proctored by Peppubuild</strong>
                 ensures exam integrity with <strong data-start="104" data-end="141">comprehensive monitoring
                   features</strong> that detect and prevent cheating in real time.</p>
@@ -167,10 +167,10 @@ export default {
         <div class="accordion-item">
           <h2 id="flush-headingThree" class="accordion-header"><button type="button" data-bs-toggle="collapse"
               data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree"
-              class="accordion-button collapsed">What Features does the Free Plan Offer</button></h2>
+              class="accordion-button collapsed whitefont">What Features does the Free Plan Offer</button></h2>
           <div id="flush-collapseThree" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample"
             class="accordion-collapse collapse">
-            <div class="accordion-body">
+            <div class="accordion-body whitefont">
               <p data-start="55" data-end="232">Our <strong data-start="59" data-end="78">7-day free plan</strong> gives
                 you access to <strong data-start="99" data-end="115">all features</strong> so you can experience <strong
                   data-start="138" data-end="165">Proctored by Peppubuild</strong> without limitations! However, there are
@@ -201,5 +201,13 @@ export default {
 </template>
 
 <style scoped>
+.accordion-button,
+.accordion-button:not(.collapsed),
+.accordion-body {
+  background-color: black
+}
+.whitefont {
+  color: white !important;
+}
 
 </style>

@@ -6,7 +6,7 @@
                 <ul id="ignf2i" class="nav flex-column">
                     <li id="iqkgvb" class="nav-item mb-2"><a href="/" id="icnr0f"
                             class="nav-link p-0 text-white">Home</a></li>
-                    <li id="i6ttr3" class="nav-item mb-2"><a href="/pricing" id="i7xrlu"
+                    <li id="i6ttr3" class="nav-item mb-2"><a href="/pricing.html" id="i7xrlu"
                             class="nav-link p-0 text-white">Pricing</a></li>
                     <li id="iwilzb" class="nav-item mb-2"><a href="/contact" id="iuu0wq"
                             class="nav-link p-0 text-white">Contact</a></li>
