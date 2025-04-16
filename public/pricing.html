@@ -205,13 +205,13 @@
       </div>
       
       <div class="flex flex-col items-center mb-8">
-        <label class="text-lg mb-2">Number of Exams: <span id="exam-count">1</span></label>
+        <label class="text-lg mb-2">Number of Students Concurrently: <span id="exam-count">1</span></label>
         <div class="w-full max-w-md">
           <div id="slider" class="my-4"></div>
           <div class="flex justify-between text-sm text-gray-400 px-2">
-            <span>1</span>
-            <span>25</span>
-            <span>50</span>
+            <span>100</span>
+            <span>300</span>
+            <span>550</span>
           </div>
         </div>
       </div>
@@ -414,18 +414,18 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Initialize variables
-      let examCount = 1;
+      let examCount = 100;
       let billingPeriod = 'monthly';
       
       // Initialize slider
       const slider = document.getElementById('slider');
       noUiSlider.create(slider, {
-        start: [1],
+        start: [100],
         connect: [true, false],
         step: 1,
         range: {
-          'min': 1,
-          'max': 50
+          'min': 100,
+          'max': 550
         }
       });
       
@@ -459,13 +459,14 @@
       
       // Price calculation
       function getBasePricePerExam() {
-        if (examCount <= 5) return 10;
-        if (examCount <= 20) return 8;
-        return 6;
+        if (examCount <= 100) return 4;
+        if (examCount <= 300) return 5;
+        if (examCount <= 550) return 6;
+        return 7;
       }
       
       function getPrice() {
-        const basePrice = getBasePricePerExam() * examCount;
+        const basePrice = getBasePricePerExam();
         return billingPeriod === 'yearly' ? basePrice * 10 : basePrice;
       }
       

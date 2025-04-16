@@ -53,6 +53,7 @@ html {
 
 .timer {
     text-align: center;
+    color: #000;
 }
 
 iframe {
@@ -182,8 +183,8 @@ export default {
             const res = await axios.get(`${serverUrl}/validate-link/${this.useremail}`);
             const proctoredData = res.data.data;
             const isFound = proctoredData.find(quiz => quiz.form === formId);
-            const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
-            if (!isFound || !isAvailable) {
+            // const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
+            if (!isFound) {
                 this.$router.push({ name: 'NotFound' })
             } else {
                 // store form name
@@ -194,7 +195,7 @@ export default {
                         sheet: this.name,
                     });
                     if (response.data.status == 'Progress') {
-                        // get start and endtime and ensure it is within timeframe.
+                       // get start and endtime and ensure it is within timeframe.
                         // load form and corresponding time.
                         const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
                         const iframe = document.getElementById("examFrame");
@@ -221,7 +222,7 @@ export default {
                     } else {
                         Swal.fire("Test Unavailable!", `You have taken this test already`, "info");
                         return null;
-                    }
+                    } 
                 } catch (error) {
                     console.error('Error checking status:', error);
                     return null;
