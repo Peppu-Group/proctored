@@ -175,7 +175,32 @@ export default {
         };
     },
     async mounted() {
+        // load form and corresponding time.
+        const formId = this.$route.params.id;
+        const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
+                        const iframe = document.getElementById("examFrame");
+
+                        // Save form link
+                        localStorage.setItem("examLink", formLink);
+                        iframe.src = formLink;
+
+                        // set Timer
+                        localStorage.setItem("currentTime", 2)
+
+                        // When the form finishes loading
+                        iframe.addEventListener('load', () => {
+                                    this.loading = false;
+                                    document.getElementById("exam-container").style.display = "flex";
+
+                                    // Set start time if not already set
+                                    if (!localStorage.getItem("examStartTime")) {
+                                        localStorage.setItem("examStartTime", Date.now());
+                                    }
+                                    this.startTimer();
+                                    this.startMonitoring();
+                                });
         // seems when the time is 0, it doesn't refresh
+        /* 
         await this.verifyToken(); // verify that token is present and return email. wrap this in a if token is available.
         const formId = this.$route.params.id;
         await this.$store.dispatch('initAccessToken');
@@ -231,7 +256,7 @@ export default {
         } catch (err) {
             Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
         };
-
+        */
     },
     methods: {
         isTimeFrame(startDateTime, endDateTime) {
