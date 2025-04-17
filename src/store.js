@@ -59,7 +59,7 @@ const store = createStore({
     actions: {
         formLink({ state }) {
             let email = localStorage.getItem('email');
-            return state.currentQuiz ? `https://proctored.peppubuild.com/getmail/${state.currentQuiz.form}?name=${state.currentQuiz.name}&email=${email}` : '';
+            return state.currentQuiz ? `https://proctored.peppubuild.com/getmail/${state.currentQuiz.form}?name=${state.currentQuiz.name}&email=${email}&time=${state.currentQuiz.time}` : '';
         },
 
         async initAccessToken({ commit, dispatch }) {

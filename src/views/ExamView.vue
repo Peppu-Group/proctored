@@ -177,6 +177,7 @@ export default {
     async mounted() {
         // load form and corresponding time.
         const formId = this.$route.params.id;
+        const time = this.$route.params.time;
         const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
                         const iframe = document.getElementById("examFrame");
 
@@ -185,7 +186,7 @@ export default {
                         iframe.src = formLink;
 
                         // set Timer
-                        localStorage.setItem("currentTime", 2)
+                        localStorage.setItem("currentTime", time)
 
                         // When the form finishes loading
                         iframe.addEventListener('load', () => {
