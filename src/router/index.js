@@ -22,7 +22,7 @@ const router = createRouter({
       component: LoginView
     },
     {
-      path: '/getmail/:id/:time',
+      path: '/getmail/:id',
       name: 'getmail',
       component: MailView
     },
@@ -32,7 +32,7 @@ const router = createRouter({
       component: SuccessView
     },
     {
-      path: '/exam/:id', name: 'exam', component: ExamView,
+      path: '/exam/:id/:time', name: 'exam', component: ExamView,
 
     },
     {
