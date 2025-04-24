@@ -94,11 +94,15 @@ export default {
             if (refresh) {
                 // Store the refresh token
                 localStorage.setItem('refreshToken', encodeURIComponent(refresh));
-                await axios.post(`${serverUrl}/add-user`, { email, fullname: name });
-                
+
                 // Send welcome email
                 try {
                     await axios.post(`${serverUrl}/send-welcome`, { name, email });
+                    try {
+                        await axios.post(`${serverUrl}/add-user`, { email, fullname: name });
+                    } catch (err) {
+                        Swal.fire("Error!", `An error occurred while sending the welcome email: ${err}`, "error");
+                    }
                 } catch (err) {
                     Swal.fire("Error!", `An error occurred while sending the welcome email: ${err}`, "error");
                 }

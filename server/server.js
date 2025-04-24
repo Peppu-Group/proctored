@@ -617,7 +617,7 @@ app.post('/add-user', async (req, res) => {
                 values: row,
             },
         });
-
+        res.send("User added!");
         console.log("Row added:", response.data.updates.updatedRange);
     } catch (error) {
         console.error("Failed to append row:", error.message);
