@@ -175,33 +175,6 @@ export default {
         };
     },
     async mounted() {
-        // load form and corresponding time.
-        const formId = this.$route.params.id;
-        const time = this.$route.params.time;
-        const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
-                        const iframe = document.getElementById("examFrame");
-
-                        // Save form link
-                        localStorage.setItem("examLink", formLink);
-                        iframe.src = formLink;
-
-                        // set Timer
-                        localStorage.setItem("currentTime", time)
-
-                        // When the form finishes loading
-                        iframe.addEventListener('load', () => {
-                                    this.loading = false;
-                                    document.getElementById("exam-container").style.display = "flex";
-
-                                    // Set start time if not already set
-                                    if (!localStorage.getItem("examStartTime")) {
-                                        localStorage.setItem("examStartTime", Date.now());
-                                    }
-                                    this.startTimer();
-                                    this.startMonitoring();
-                                });
-        // seems when the time is 0, it doesn't refresh
-        /* 
         await this.verifyToken(); // verify that token is present and return email. wrap this in a if token is available.
         const formId = this.$route.params.id;
         await this.$store.dispatch('initAccessToken');
@@ -209,8 +182,8 @@ export default {
             const res = await axios.get(`${serverUrl}/validate-link/${this.useremail}`);
             const proctoredData = res.data.data;
             const isFound = proctoredData.find(quiz => quiz.form === formId);
-            // const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
-            if (!isFound) {
+            const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
+            if (!isFound || !isAvailable) {
                 this.$router.push({ name: 'NotFound' })
             } else {
                 // store form name
@@ -257,7 +230,6 @@ export default {
         } catch (err) {
             Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
         };
-        */
     },
     methods: {
         isTimeFrame(startDateTime, endDateTime) {

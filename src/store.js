@@ -4,7 +4,7 @@ import { createStore } from 'vuex';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
-const serverUrl = `https://proctored.server.peppubuild.com`;
+const serverUrl = `http://localhost:3000`;
 const refreshToken = localStorage.getItem('refreshToken') || null;
 
 const store = createStore({
@@ -59,7 +59,7 @@ const store = createStore({
     actions: {
         formLink({ state }) {
             let email = localStorage.getItem('email');
-            return state.currentQuiz ? `https://proctored.peppubuild.com/getmail/${state.currentQuiz.form}?name=${state.currentQuiz.name}&email=${email}&time=${state.currentQuiz.time}` : '';
+            return state.currentQuiz ? `https://proctored.peppubuild.com/getmail/${state.currentQuiz.form}?name=${state.currentQuiz.name}&email=${email}` : '';
         },
 
         async initAccessToken({ commit, dispatch }) {

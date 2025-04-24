@@ -16,7 +16,7 @@
             <li id="i8u3z" class="nav-item dropdown"></li>
           </ul>
           <form id="i3sse" class="d-flex">
-            <div id="iy6fr"><a href="#" type="button" id="ia06o" class="btn btn-primary">Get Started Now!</a></div>
+            <div id="iy6fr"><a href="/app" type="button" id="ia06o" class="btn btn-primary">Get Started Now!</a></div>
           </form>
         </div>
       </div>

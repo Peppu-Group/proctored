@@ -28,8 +28,8 @@ export default {
       </p>
       
       <div class="button-container">
-        <a href="#" class="btn btn-primary">Prepare your first test</a>
-        <a href="/contact" class="btn btn-outline">Speak to our team</a>
+        <a href="/app" class="btn btn-primary">Prepare your first test</a>
+        <a href="https://calendly.com/ugochi-ukpai-peppubuild/30min" class="btn btn-outline">Speak to our team</a>
       </div>
       
       
@@ -56,7 +56,7 @@ export default {
           <p class="feature-description">
             With our AI-Powered proctoring, maintain academic honesty and prevent cheating. Peppubuild offers monitoring for screen activity, webcam feeds, and user behavior in real time.
           </p>
-          <a href="#" class="btn btn-primary">Try Now</a>
+          <a href="/app" class="btn btn-primary">Try Now</a>
         </div>
         
         <!-- Feature 2 -->
@@ -71,7 +71,7 @@ export default {
           <p class="feature-description">
             Ensure fair and structured assessments. Set strict time limits for exams, keeping students focused and preventing unfair advantages. Track and save progress on Google Forms.
           </p>
-          <a href="#" class="btn btn-primary">Try Now</a>
+          <a href="/app" class="btn btn-primary">Try Now</a>
         </div>
         
         <!-- Feature 3 -->
@@ -99,7 +99,7 @@ export default {
           <p class="feature-description">
             Track exam performance, detect anomalies, and ensure fairness with automated reports. Gain insights into test results and trends, generate reports in multiple formats for easy review.
           </p>
-          <a href="#" class="btn btn-primary">Try Now</a>
+          <a href="/app" class="btn btn-primary">Try Now</a>
         </div>
       </div>
     </section>

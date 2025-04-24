@@ -6,7 +6,7 @@
         <!-- Centered Quiz Container -->
         <div class="d-flex flex-grow-1 justify-content-center align-items-center bg-light" style="height: 100vh;">
             <div class="quiz-container p-4 bg-white rounded shadow" style="min-width: 300px;">
-                <h2 class="fw-bold text-center mb-4">Register your info to start your quiz</h2>
+                <h2 class="fw-bold text-center mb-4 text-dark">Register your info to start your quiz</h2>
 
                 <div class="mb-3">
                     <label for="fullName" class="form-label">Full Name</label>

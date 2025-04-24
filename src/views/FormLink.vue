@@ -16,10 +16,10 @@
                 </p>
                 <div class="input-group my-3">
                     <input type="text" class="form-control text-center"
-                        :value="generateQuizLink(currentQuiz?.form || '', currentQuiz?.name || '', currentQuiz?.time || '')" readonly>
+                        :value="generateQuizLink(currentQuiz?.form || '', currentQuiz?.name || '')" readonly>
                     <button class="btn btn-primary"
                         @click="copyLink(currentQuiz?.form || '', currentQuiz?.name || '')">Copy</button>
-                    <a :href="generateQuizLink(currentQuiz?.form || '', currentQuiz?.name || '', currentQuiz?.time || '')"><i
+                    <a :href="generateQuizLink(currentQuiz?.form || '', currentQuiz?.name || '')"><i
                             class="bi bi-box-arrow-up-right bicon"></i></a>
                 </div>
                 <p class="text-muted">
@@ -67,15 +67,15 @@ export default {
     },
 
     methods: {
-        copyLink(id, name, time) {
-            let formLink = this.generateQuizLink(id, name, time);
+        copyLink(id, name) {
+            let formLink = this.generateQuizLink(id, name);
             navigator.clipboard.writeText(`${formLink}`);
             Swal.fire("Success!", "Quiz link copied!", "success");
         },
-        generateQuizLink(id, name, time) {
+        generateQuizLink(id, name) {
             if (id && name) {
                 let email = localStorage.getItem('email');
-                return id ? `${frontUrl}/getmail/${id}?name=${name}&email=${email}&time=${time}` : ''; // Returns URL if ID exists, else empty string
+                return id ? `${frontUrl}/getmail/${id}?name=${name}&email=${email}` : ''; // Returns URL if ID exists, else empty string
             } else {
                 return '';
             }

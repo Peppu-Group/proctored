@@ -32,7 +32,7 @@ const router = createRouter({
       component: SuccessView
     },
     {
-      path: '/exam/:id/:time', name: 'exam', component: ExamView,
+      path: '/exam/:id', name: 'exam', component: ExamView,
 
     },
     {
