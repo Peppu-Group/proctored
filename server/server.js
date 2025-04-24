@@ -372,7 +372,7 @@ app.get('/get-proctored/:accessToken', async (req, res) => {
 
     } catch (err) {
         console.error('Error retrieving proctored.json:', err.message);
-        res.status(500).json({ error: 'Failed to fetch proctored.json' });
+        res.status(500).json({ error: `Failed to fetch proctored.json: ${err.message}` });
     }
 });
 
@@ -582,6 +582,7 @@ app.get('/oauth2callback', async (req, res) => {
                 } catch (err) {
                     return res.send(`Error sharing file: ${err}`);
                 }
+                // write user name and email into our Google sheet.
             } catch (error) {
                 console.error('Error creating file:', error);
                 return res.status(500).send('Failed to create file');
@@ -590,8 +591,8 @@ app.get('/oauth2callback', async (req, res) => {
 
         // Return the access token to the client
         const redirectUrl = `https://proctored.peppubuild.com/login?${qs.stringify({
-        token: access_token,
-        refresh: refresh_token,
+            token: access_token,
+            refresh: refresh_token,
         })}`;
         res.redirect(redirectUrl);
 
@@ -602,8 +603,47 @@ app.get('/oauth2callback', async (req, res) => {
     }
 });
 
+app.post('/add-user', async (req, res) => {
+    const { email, fullname } = req.body;
+    const row = [[email, fullname]]; // 2 columns: A (email), B (fullname)
+    const { sheets, drive } = getSheetsAndDrive();
+    try {
+        const response = await sheets.spreadsheets.values.append({
+            spreadsheetId: "1pvWrU-Qdv7-LZmSB4T-F1Hqp6ye2lVKPk-9Gv31lkKI",
+            range: "A:B", // Target columns A and B
+            valueInputOption: "RAW",
+            insertDataOption: "INSERT_ROWS",
+            resource: {
+                values: row,
+            },
+        });
+
+        console.log("Row added:", response.data.updates.updatedRange);
+    } catch (error) {
+        console.error("Failed to append row:", error.message);
+    }
+})
+
+async function readSheetValues(range = "Sheet1!A1:B100") {
+    const { sheets, drive } = getSheetsAndDrive();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: "1pvWrU-Qdv7-LZmSB4T-F1Hqp6ye2lVKPk-9Gv31lkKI",
+      range, // e.g., "Sheet1!A1:B10"
+    });
+  
+    const rows = response.data.values;
+    return rows || []; // Return empty array if no values
+}
+
+// Example usage, only uncomment this to know user list
+/* 
+readSheetValues().then(values => {
+    console.log("Sheet Data:", values);
+});
+*/
+
 app.get('/getrefresh/:email', async (req, res) => {
-   // Route to get users.json content
+    // Route to get users.json content
     const email = req.params.email;
     const { sheets, drive } = getSheetsAndDrive();
 
@@ -699,7 +739,7 @@ app.get('/validate-link/:email', async (req, res) => {
 
     try {
         // 1. Search for proctored.json in Drive
-        const query =  `name = 'proctored.json' and mimeType = 'application/json' and trashed = false and '${email}' in owners`
+        const query = `name = 'proctored.json' and mimeType = 'application/json' and trashed = false and '${email}' in owners`
 
         const response = await drive.files.list({
             q: query,
