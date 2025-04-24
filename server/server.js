@@ -636,11 +636,11 @@ async function readSheetValues(range = "Sheet1!A1:B100") {
 }
 
 // Example usage, only uncomment this to know user list
-/* 
+
 readSheetValues().then(values => {
     console.log("Sheet Data:", values);
 });
-*/
+
 
 app.get('/getrefresh/:email', async (req, res) => {
     // Route to get users.json content
