@@ -181,10 +181,12 @@ export default {
         try {
             const res = await axios.get(`${serverUrl}/validate-link/${this.useremail}`);
             const proctoredData = res.data.data;
+            console.log(res)
+            console.log(proctoredData)
             const isFound = proctoredData.find(quiz => quiz.form === formId);
             const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
             if (!isFound || !isAvailable) {
-                this.$router.push({ name: 'NotFound' })
+                // this.$router.push({ name: 'NotFound' })
             } else {
                 // store form name
                 this.name = isFound.name

@@ -54,8 +54,7 @@ export default {
     methods: {
         async getLink() {
             if (this.$route.params.id && this.$route.query.name && this.$route.query.email) {
-                let time = this.$route.query.time;
-                let link = `${frontUrl}/exam/${this.$route.params.id}/${time}`;
+                let link = `${frontUrl}/exam/${this.$route.params.id}/`;
                 let email = this.email;
                 let name = this.fullName;
                 let useremail = this.$route.query.email;
