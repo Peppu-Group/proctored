@@ -4,7 +4,7 @@ import { createStore } from 'vuex';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
-const serverUrl = `http://localhost:3000`;
+const serverUrl = `http://proctored.server.peppubuild.com`;
 const refreshToken = localStorage.getItem('refreshToken') || null;
 
 const store = createStore({
