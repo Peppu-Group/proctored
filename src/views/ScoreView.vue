@@ -12,7 +12,7 @@
 
                     </div>
                 </div>
-                <div class="alert alert-warning d-flex alert-dismissible fade show align-items-center" role="alert">
+                <div class="alert alert-warning d-flex alert-dismissible fade show align-items-center" role="alert" v-if="time == false">
                     <div>
                         <h3>Quiz Ongoing</h3>
                         This exam may still be ongoing. This could be because an end date wasn't set in this platform. If
