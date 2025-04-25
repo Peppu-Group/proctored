@@ -198,6 +198,38 @@ async function updateStatusToFinished(email, sheet, violations) {
     return { success: true, row: targetRow, message: 'Status updated to Finished.' };
 }
 
+async function readStudentsValues(name) {
+    const { sheets, drive } = getSheetsAndDrive();
+
+    // Step 1: Find the spreadsheet by name
+    const fileList = await drive.files.list({
+        q: `name='${name}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed = false`,
+        fields: 'files(id, name)',
+    });
+
+    if (fileList.data.files.length === 0) {
+        throw new Error(`Spreadsheet named "${name}" not found.`);
+    }
+
+    const spreadsheetId = fileList.data.files[0].id;
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Sheet1!A1:E600" // e.g., "Sheet1!A1:B10"
+    });
+  
+    const rows = response.data.values;
+    return rows || []; // Return empty array if no values
+}
+
+app.get('/get-score/:name', async (req, res) => {
+    let name = req.params.name;
+
+    readStudentsValues(name).then(values => {
+        res.send(values);
+    });
+})
+
 app.post('/write-sheet', async (req, res) => {
     const { sheet: sheetName, name: fullName, email, status } = req.body;
     try {
@@ -636,10 +668,11 @@ async function readSheetValues(range = "Sheet1!A1:B100") {
 }
 
 // Example usage, only uncomment this to know user list
-
+/* 
 readSheetValues().then(values => {
     console.log("Sheet Data:", values);
 });
+*/
 
 
 app.get('/getrefresh/:email', async (req, res) => {
