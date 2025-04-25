@@ -27,7 +27,7 @@
                         <a class="dropdown-item" href="#" @click="deleteQuiz(quiz.form, quiz.name)">Delete</a>
                         <a class="dropdown-item" href="#" @click="editQuiz(quiz.form)">Edit</a>
                         <a class="dropdown-item" href="#" @click="getLink(quiz.form)">Get Link</a>
-                        <a class="dropdown-item" href="#" @click="getResults(quiz.name)">Get Results</a>
+                        <a class="dropdown-item" href="#" @click="getResults(quiz)">Get Results</a>
                     </div>
                 </div>
             </div>
@@ -62,9 +62,17 @@ export default {
         addQuiz() {
             createQuiz()
         },
-        getResults(name) {
+        getResults(quiz) {
             // allow result downloading.
-            this.$router.push({ path: '/student-score', query: { name } })
+            let endTime = quiz?.end ?? null;
+            let timeExpired = false;
+
+            if (endTime) {
+                const now = new Date();
+                const end = new Date(endTime);
+                timeExpired = now >= end;
+                this.$router.push({ path: '/student-score', query: { name: quiz.name, time: timeExpired } })
+            }
         },
         isCurrentDateTimeAfterEnd(endDateStr) {
             const now = new Date();
@@ -193,7 +201,7 @@ export default {
                         formIdToDelete,
                         sheetName
                     });
-                } 
+                }
             });
 
         }

@@ -22,7 +22,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 </div>
-                <div class="p-3">
+                <div class="p-3" v-if="scoreList">
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -46,11 +46,20 @@
                                     'status-dot': true,
                                     'green': row[3] <= 2,
                                     'red': row[3] > 2
-                                }"></span>{{ row[3] }}</td>
-                                <td>{{ row[4] || 'Quiz mode not set' }} </td>
+                                }"></span>{{ row[3] || 'Exam in progress' }}</td>
+                                <td>{{ row[4] || 'Unavailable' }} </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div v-else>
+                    <div class="alert alert-primary d-flex alert-dismissible fade show align-items-center" role="alert">
+                    <div>
+                        <h3>Quiz Ongoing</h3>
+                        This exam may still be ongoing, no student has completed or attempted it yet.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -61,6 +70,7 @@
 import SideBar from '../components/SideBar.vue';
 import axios from 'axios';
 import { createQuiz } from '@/utils/swalQuiz';
+const serverUrl = `https://proctored.server.peppubuild.com`;
 
 export default {
     name: 'ScoreView',
@@ -68,7 +78,8 @@ export default {
 
     data() {
         return {
-            scoreList: null
+            scoreList: null,
+            time: false,
         };
     },
 
@@ -76,10 +87,11 @@ export default {
         // get score from axios. we should consider encrypting the name in the route so users can't get score of other students.
         let name = this.$route.query.name;
         if (name) {
+            this.time = this.$route.query.time;
             try {
                 let res = await axios.get(`${serverUrl}/get-score/${name}`)
                 if (res) {
-                    this.scoreList = res;
+                    this.scoreList = res.data;
                 }
             } catch {
                 Swal.fire('Test Unavailable!', 'We cannot access this test score, could be your network', 'error');
