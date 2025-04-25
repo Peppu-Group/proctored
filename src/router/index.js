@@ -7,6 +7,7 @@ import LoginView from '../views/LoginView.vue'
 import LostView from '../views/LostView.vue'
 import MailView from '../views/MailView.vue'
 import SuccessView from '../views/SuccessView.vue'
+import ScoreView from '../views/ScoreView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,9 @@ const router = createRouter({
     },
     {
       path: '/form-link', name: 'formlink', component: FormLink, meta: { requiresAuth: true }
+    },
+    {
+      path: '/student-score', name: 'student-score', component: ScoreView, meta: { requiresAuth: true }
     },
     {
       path: '/contact',

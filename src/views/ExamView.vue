@@ -186,7 +186,7 @@ export default {
             const isFound = proctoredData.find(quiz => quiz.form === formId);
             const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
             if (!isFound || !isAvailable) {
-                // this.$router.push({ name: 'NotFound' })
+                this.$router.push({ name: 'NotFound' })
             } else {
                 // store form name
                 this.name = isFound.name
