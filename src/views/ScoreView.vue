@@ -77,7 +77,7 @@ export default {
         let name = this.$route.query.name;
         if (name) {
             try {
-                let res = await axios.post(`${serverUrl}/get-score/${name}`)
+                let res = await axios.get(`${serverUrl}/get-score/${name}`)
                 if (res) {
                     this.scoreList = res;
                 }
