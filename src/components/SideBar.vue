@@ -66,13 +66,10 @@ export default {
             // allow result downloading.
             let endTime = quiz?.end ?? null;
             let timeExpired = false;
-
-            if (endTime) {
-                const now = new Date();
-                const end = new Date(endTime);
-                timeExpired = now >= end;
-                this.$router.push({ path: '/student-score', query: { name: quiz.name, time: timeExpired } })
-            }
+            const now = new Date();
+            const end = new Date(endTime);
+            timeExpired = now >= end;
+            this.$router.push({ path: '/student-score', query: { name: quiz.name, time: timeExpired } })
         },
         isCurrentDateTimeAfterEnd(endDateStr) {
             const now = new Date();
