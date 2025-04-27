@@ -12,12 +12,14 @@ const qs = require('querystring');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const fs = require('fs').promises;
-
+const paystack = require('./paystack');
+const crypto = require('crypto');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
+app.use(express.json({ verify: (req, res, buf) => { req.rawBody = buf; } }));
 
 const {
     GOOGLE_CLIENT_ID,
@@ -214,10 +216,10 @@ async function readStudentsValues(name) {
     const spreadsheetId = fileList.data.files[0].id;
 
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "Sheet1!A1:E600" // e.g., "Sheet1!A1:B10"
+        spreadsheetId,
+        range: "Sheet1!A1:E600" // e.g., "Sheet1!A1:B10"
     });
-  
+
     const rows = response.data.values;
     return rows || []; // Return empty array if no values
 }
@@ -659,10 +661,10 @@ app.post('/add-user', async (req, res) => {
 async function readSheetValues(range = "Sheet1!A1:B100") {
     const { sheets, drive } = getSheetsAndDrive();
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: "1pvWrU-Qdv7-LZmSB4T-F1Hqp6ye2lVKPk-9Gv31lkKI",
-      range, // e.g., "Sheet1!A1:B10"
+        spreadsheetId: "1pvWrU-Qdv7-LZmSB4T-F1Hqp6ye2lVKPk-9Gv31lkKI",
+        range, // e.g., "Sheet1!A1:B10"
     });
-  
+
     const rows = response.data.values;
     return rows || []; // Return empty array if no values
 }
@@ -914,5 +916,30 @@ app.post('/send-welcome', async (req, res) => {
     }
 
 })
+
+/**
+ * Manage User Subscribtions with Paystack.
+*/
+async function subscribeUser(email, planCode) {
+    const response = await paystack.post('/subscription', {
+        customer: email,
+        plan: planCode
+    });
+
+    return response.data;
+}
+
+app.post('/paystack-webhook', (req, res) => {
+  const event = req.body;
+
+    
+    if (event.event === 'charge.success') {
+        return res.sendStatus(200).redirect('https://proctored.peppubuild.com/app');
+    }
+ 
+
+  // add posibility to redirect res.sendStatus(200).redirect();
+  res.sendStatus(200);
+});
 
 app.listen(3000, () => console.log('Server running on port 3000'));
