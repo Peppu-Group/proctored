@@ -34,7 +34,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(row, index) in scoreList" :key="index">
+                            <tr v-for="(row, index) in displayedList" :key="index">
                                 <td></td>
                                 <td>{{ row[1] }}<br><span :class="{
                                     'status-dot': true,
@@ -51,6 +51,11 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div class="d-flex justify-content-center align-items-center mt-3">
+                        <button class="btn btn-sm btn-outline-primary me-2" @click="prevPage" :disabled="currentPage === 1">Previous</button>
+                        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                        <button class="btn btn-sm btn-outline-primary ms-2" @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+                    </div>
                 </div>
                 <div v-else>
                     <div class="alert alert-primary d-flex alert-dismissible fade show align-items-center" role="alert">
@@ -78,13 +83,26 @@ export default {
 
     data() {
         return {
-            scoreList: null,
+            scoreList: [],
+            paginatedList: [],
+            currentPage: 1,
+            itemsPerPage: 100,
             time: false,
         };
     },
 
+    computed: {
+        totalPages() {
+            return Math.ceil(this.scoreList.length / this.itemsPerPage);
+        },
+        displayedList() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.scoreList.slice(start, end);
+        }
+    },
+
     async mounted() {
-        // get score from axios. we should consider encrypting the name in the route so users can't get score of other students.
         let name = this.$route.query.name;
         if (name) {
             this.time = this.$route.query.time;
@@ -104,6 +122,16 @@ export default {
     methods: {
         async addQuiz() {
             createQuiz();
+        },
+        nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+            }
+        },
+        prevPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+            }
         }
     }
 }
