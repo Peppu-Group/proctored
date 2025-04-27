@@ -40,6 +40,13 @@
                                     access and process user data as required for the core functionality of the application,
                                     in compliance with Google’s policies.</p>
                             </li>
+                            <li>
+                                <p>
+                                    We <strong data-start="528" data-end="536">will not sell your data to third parties</strong>, but we 
+                                    will use your data to provide you with the services you requested like linking and storing student's
+                                    score and violations in your Drive (Google Drive). 
+                                </p>
+                            </li>
                             <li data-start="665" data-end="778">
                                 <p data-start="667" data-end="778">We <strong data-start="670" data-end="701">do not store,
                                         share, or use</strong> user data for any purpose beyond what is explicitly stated in

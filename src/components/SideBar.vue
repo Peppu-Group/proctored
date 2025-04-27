@@ -8,7 +8,7 @@
                     <div class="progress-bar bg-success" role="progressbar" style="width: 95%" aria-valuenow="95"
                         aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <small>Recommended plan: Starter</small>
+                <a class='text-light' href="https://paystack.com/pay/gn77uq85en"><small>Upgrade (Recommended: Starter)</small></a>
             </div>
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <router-link to="/app" class="link">
