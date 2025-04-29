@@ -137,6 +137,64 @@ async function checkEmailStatus(email, sheet) {
 }
 
 
+// get all StudentScore after exam, then get the email and matching score.
+app.get('/get-quiz-scores/:formId/:accessToken', async (req, res) => {
+    const { formId, accessToken } = req.params;
+
+    const auth = new OAuth2Client();
+    auth.setCredentials({ access_token: accessToken });
+  
+    try {
+      const forms = google.forms({ version: 'v1', auth });
+  
+      const response = await forms.forms.responses.list({
+        formId: formId,
+      });
+  
+      const responses = response.data.responses || [];
+  
+      const result = responses.map(resp => {
+        let email = 'Unavailable';
+        let score = 'Unavailable';
+  
+        // Find email inside answers
+        if (resp.answers) {
+          for (const questionId in resp.answers) {
+            const answer = resp.answers[questionId];
+            const textAnswers = answer?.textAnswers?.answers || [];
+  
+            for (const singleAnswer of textAnswers) {
+              if (validateEmail(singleAnswer.value)) {
+                email = singleAnswer.value;
+                break;
+              }
+            }
+            if (email !== 'Unavailable') break; // Stop after finding the email
+          }
+        }
+  
+        // Find score (correct key is 'grade', not 'grading')
+        if (resp.grade) {
+          score = resp.grade.score ?? 'Unavailable';
+        }
+  
+        return { email, score };
+      });
+  
+      res.json(result);
+  
+    } catch (error) {
+      console.error('Error fetching form scores:', error.message);
+      res.status(500).json({ error: 'Failed to retrieve quiz scores' });
+    }
+});
+  
+  // Helper function to validate email
+  function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }
+
 app.post('/update-sheet', async (req, res) => {
     const { sheet: sheetName, email, violations } = req.body;
     try {
@@ -538,7 +596,7 @@ const OAUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?` +
         client_id: GOOGLE_CLIENT_ID,
         redirect_uri: REDIRECT_URI,
         response_type: 'code',
-        scope: 'openid profile email drive.file',
+        scope: 'openid profile email drive.file forms.responses.readonly',
         access_type: 'offline',  // Request offline access for refresh token
     });
 

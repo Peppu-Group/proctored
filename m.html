@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection Monitoring System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .control-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .control-panel button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        #startButton {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        #startButton:hover {
+            background-color: #27ae60;
+        }
+        
+        #stopButton {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        #stopButton:hover {
+            background-color: #c0392b;
+        }
+        
+        #statsButton {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        #statsButton:hover {
+            background-color: #2980b9;
+        }
+        
+        #clearLogButton {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        #clearLogButton:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .status-panel {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .video-container {
+            width: 50%;
+            position: relative;
+        }
+        
+        #videoElement {
+            width: 640px;
+            height: 480px;
+            background-color: #000;
+            border-radius: 5px;
+        }
+        
+        #canvasElement {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 640px;
+            height: 480px;
+            border-radius: 5px;
+        }
+        
+        .stats-container {
+            width: 50%;
+            padding: 0 20px;
+        }
+        
+        .stats-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .face-status {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .face-detected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .face-not-detected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .stats-table th, .stats-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .stats-table th {
+            background-color: #e9ecef;
+        }
+        
+        .log-container {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 3px;
+        }
+        
+        .log-error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .log-info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .log-timestamp {
+            color: #6c757d;
+            font-size: 0.85em;
+        }
+        
+        .settings-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .settings-panel h3 {
+            margin-top: 0;
+        }
+        
+        .settings-form {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            margin-right: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100px;
+            padding: 6px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Face Detection Monitoring System</h1>
+        
+        <div class="control-panel">
+            <button id="startButton">Start Detection</button>
+            <button id="stopButton">Stop Detection</button>
+            <button id="statsButton">Get Statistics</button>
+            <button id="clearLogButton">Clear Log</button>
+        </div>
+        
+        <div class="status-panel">
+            <div class="video-container">
+                <video id="videoElement" playsinline></video>
+                <canvas id="canvasElement"></canvas>
+            </div>
+            
+            <div class="stats-container">
+                <div id="faceStatus" class="face-status face-not-detected">No Face Detected</div>
+                
+                <div class="stats-box">
+                    <h3>Statistics</h3>
+                    <table class="stats-table">
+                        <tr>
+                            <th>Face Away Events</th>
+                            <td id="faceAwayEvents">0</td>
+                        </tr>
+                        <tr>
+                            <th>Total Face Away Time</th>
+                            <td id="totalFaceAwayTime">0 sec</td>
+                        </tr>
+                        <tr>
+                            <th>Average Face Away Duration</th>
+                            <td id="avgFaceAwayTime">0 sec</td>
+                        </tr>
+                        <tr>
+                            <th>Current Session Duration</th>
+                            <td id="sessionDuration">0 sec</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Detection Log</h3>
+        <div id="logContainer" class="log-container"></div>
+        
+        <div class="settings-panel">
+            <h3>Settings</h3>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="minConfidence">Min. Confidence (%)</label>
+                    <input type="number" id="minConfidence" value="50" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="lookAwayThreshold">Look Away Threshold (ms)</label>
+                    <input type="number" id="lookAwayThreshold" value="1500" min="500" step="100">
+                </div>
+                <div class="form-group">
+                    <label for="samplingRate">Sampling Rate (ms)</label>
+                    <input type="number" id="samplingRate" value="100" min="50" step="10">
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 Face Detection Monitoring System</p>
+        </footer>
+    </div>
+
+    <!-- Include MediaPipe dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+    <script>
+        // Configuration options - will be updated from UI
+        const config = {
+            lookAwayThresholdMs: 1500,  // Time threshold to consider user looking away (milliseconds)
+            samplingRate: 100,          // How often to check face position (milliseconds)
+            debugMode: true,            // Enable console logging
+            minDetectionConfidence: 0.5 // Minimum confidence threshold for face detection
+        };
+
+        // Track user state
+        let state = {
+            isFaceDetected: false,
+            lastFaceDetectionTime: Date.now(),
+            faceDisappearStartTime: null,
+            totalFaceAwayTime: 0,
+            faceAwayEvents: 0,
+            sessionStartTime: null
+        };
+
+        // References to HTML elements
+        const elements = {
+            video: document.getElementById('videoElement'),
+            canvas: document.getElementById('canvasElement'),
+            startButton: document.getElementById('startButton'),
+            stopButton: document.getElementById('stopButton'),
+            statsButton: document.getElementById('statsButton'),
+            clearLogButton: document.getElementById('clearLogButton'),
+            logContainer: document.getElementById('logContainer'),
+            faceStatus: document.getElementById('faceStatus'),
+            faceAwayEvents: document.getElementById('faceAwayEvents'),
+            totalFaceAwayTime: document.getElementById('totalFaceAwayTime'),
+            avgFaceAwayTime: document.getElementById('avgFaceAwayTime'),
+            sessionDuration: document.getElementById('sessionDuration'),
+            minConfidence: document.getElementById('minConfidence'),
+            lookAwayThreshold: document.getElementById('lookAwayThreshold'),
+            samplingRate: document.getElementById('samplingRate')
+        };
+
+        // Initialize canvas context
+        const canvasCtx = elements.canvas.getContext('2d');
+
+        // Global detector instance
+        let detector = null;
+
+        // Initialize error logging - only for when user's face is not on screen
+        const errorLog = {
+            errors: [],
+            log: function(message, details = {}, type = 'error') {
+                const error = {
+                    timestamp: new Date().toISOString(),
+                    message: message,
+                    details: details,
+                    type: type
+                };
+                
+                this.errors.push(error);
+                
+                // Log to console
+                if (config.debugMode) {
+                    if (type === 'error') {
+                        console.error(`[FACE NOT DETECTED] ${error.message}`, error.details);
+                    } else {
+                        console.log(`[INFO] ${error.message}`, error.details);
+                    }
+                }
+                
+                // Add to UI log
+                this.addToUILog(error);
+            },
+            
+            addToUILog: function(log) {
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry log-${log.type}`;
+                
+                const timestamp = new Date(log.timestamp).toLocaleTimeString();
+                
+                let detailsStr = '';
+                if (log.details) {
+                    for (const [key, value] of Object.entries(log.details)) {
+                        if (value) {
+                            detailsStr += `${key}: ${value}, `;
+                        }
+                    }
+                    detailsStr = detailsStr.replace(/, $/, '');
+                }
+                
+                logEntry.innerHTML = `
+                    <span class="log-timestamp">[${timestamp}]</span>
+                    <strong>${log.message}</strong>
+                    ${detailsStr ? '<br>' + detailsStr : ''}
+                `;
+                
+                elements.logContainer.appendChild(logEntry);
+                elements.logContainer.scrollTop = elements.logContainer.scrollHeight;
+            },
+            
+            getErrors: function() {
+                return this.errors;
+            },
+            
+            clear: function() {
+                this.errors = [];
+                elements.logContainer.innerHTML = '';
+            }
+        };
+
+        // Face detection functionality using MediaPipe
+        class FaceDetector {
+            constructor() {
+                this.tracking = false;
+                this.faceDetection = null;
+                this.checkInterval = null;
+                this.camera = null;
+                this.updateStatsInterval = null;
+            }
+
+            async initialize() {
+                try {
+                    // Set video properties
+                    elements.video.width = 640;
+                    elements.video.height = 480;
+                    
+                    // Set canvas properties
+                    elements.canvas.width = 640;
+                    elements.canvas.height = 480;
+                    
+                    // Load MediaPipe FaceDetection
+                    await this.loadMediaPipe();
+                    
+                    // Request camera access
+                    await this.setupCamera();
+                    
+                    return true;
+                } catch (error) {
+                    console.error("Failed to initialize face detection:", error.message);
+                    errorLog.log("Failed to initialize face detection", { 
+                        errorMessage: error.message 
+                    }, 'error');
+                    return false;
+                }
+            }
+
+            async loadMediaPipe() {
+                // Initialize MediaPipe FaceDetection
+                this.faceDetection = new FaceDetection({
+                    locateFile: (file) => {
+                        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`;
+                    }
+                });
+                
+                this.faceDetection.setOptions({
+                    model: 'short',
+                    minDetectionConfidence: config.minDetectionConfidence
+                });
+                
+                this.faceDetection.onResults((results) => {
+                    this.processResults(results);
+                });
+            }
+
+            async setupCamera() {
+                const constraints = {
+                    video: {
+                        width: 640,
+                        height: 480,
+                        facingMode: 'user'
+                    }
+                };
+                
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    elements.video.srcObject = stream;
+                    
+                    return new Promise((resolve) => {
+                        elements.video.onloadedmetadata = () => {
+                            resolve(true);
+                        };
+                    });
+                } catch (error) {
+                    console.error("Error accessing camera:", error.message);
+                    errorLog.log("Error accessing camera", { 
+                        errorMessage: error.message 
+                    }, 'error');
+                    throw error;
+                }
+            }
+
+            start() {
+                if (this.tracking) return;
+                
+                // Update configuration from UI
+                this.updateConfigFromUI();
+                
+                // Initialize state
+                this.tracking = true;
+                state.lastFaceDetectionTime = Date.now();
+                state.sessionStartTime = Date.now();
+                
+                // Start the camera with MediaPipe
+                this.camera = new Camera(elements.video, {
+                    onFrame: async () => {
+                        await this.faceDetection.send({image: elements.video});
+                    },
+                    width: 640,
+                    height: 480
+                });
+                this.camera.start();
+                
+                // Start interval for checking face status
+                this.checkInterval = setInterval(() => {
+                    this.checkFaceStatus();
+                }, config.samplingRate);
+                
+                // Start interval for updating stats display
+                this.updateStatsInterval = setInterval(() => {
+                    this.updateStatsDisplay();
+                }, 1000);
+                
+                errorLog.log("Face detection started", {}, 'info');
+            }
+
+            stop() {
+                if (!this.tracking) return;
+                
+                this.tracking = false;
+                
+                // Stop camera
+                if (this.camera) {
+                    this.camera.stop();
+                }
+                
+                // Clear intervals
+                clearInterval(this.checkInterval);
+                clearInterval(this.updateStatsInterval);
+                
+                // Clear canvas
+                canvasCtx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
+                
+                errorLog.log("Face detection stopped", {}, 'info');
+            }
+
+            updateConfigFromUI() {
+                config.minDetectionConfidence = elements.minConfidence.value / 100;
+                config.lookAwayThresholdMs = parseInt(elements.lookAwayThreshold.value);
+                config.samplingRate = parseInt(elements.samplingRate.value);
+                
+                // Update MediaPipe settings if already initialized
+                if (this.faceDetection) {
+                    this.faceDetection.setOptions({
+                        minDetectionConfidence: config.minDetectionConfidence
+                    });
+                }
+            }
+
+            processResults(results) {
+                const currentTime = Date.now();
+                const faceDetected = results.detections && results.detections.length > 0;
+                
+                // Update state based on face detection
+                if (faceDetected) {
+                    // Face is detected
+                    if (!state.isFaceDetected) {
+                        // Face just reappeared
+                        const faceAwayDuration = currentTime - state.faceDisappearStartTime;
+                        state.totalFaceAwayTime += faceAwayDuration;
+                        
+                        errorLog.log("Face returned to screen", {
+                            duration: (faceAwayDuration / 1000).toFixed(1) + ' seconds'
+                        }, 'info');
+                        
+                        // Update UI face status
+                        elements.faceStatus.textContent = "Face Detected";
+                        elements.faceStatus.className = "face-status face-detected";
+                    }
+                    
+                    state.isFaceDetected = true;
+                    state.lastFaceDetectionTime = currentTime;
+                    state.faceDisappearStartTime = null;
+                    
+                    // Draw detection results
+                    this.drawResults(results);
+                } else {
+                    // Face is not detected
+                    if (state.isFaceDetected) {
+                        // Face just disappeared
+                        state.faceDisappearStartTime = currentTime;
+                        state.faceAwayEvents++;
+                        
+                        errorLog.log("User face not detected", {
+                            eventNumber: state.faceAwayEvents
+                        }, 'error');
+                        
+                        // Update UI face status
+                        elements.faceStatus.textContent = "No Face Detected";
+                        elements.faceStatus.className = "face-status face-not-detected";
+                        
+                        // Clear canvas
+                        canvasCtx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
+                    }
+                    
+                    state.isFaceDetected = false;
+                }
+            }
+
+            checkFaceStatus() {
+                const currentTime = Date.now();
+                
+                // If face not detected and time exceeds threshold
+                if (!state.isFaceDetected && state.faceDisappearStartTime) {
+                    const duration = currentTime - state.faceDisappearStartTime;
+                    
+                    if (duration > config.lookAwayThresholdMs) {
+                        this.handleExtendedFaceAway(duration);
+                    }
+                }
+            }
+            
+            handleExtendedFaceAway(duration) {
+                // Log extended face absence as an error
+                if (duration % 3000 < config.samplingRate) {  // Log every 3 seconds
+                    errorLog.log("User face still not detected", {
+                        duration: (duration / 1000).toFixed(1) + ' seconds',
+                        eventNumber: state.faceAwayEvents
+                    }, 'error');
+                }
+                
+                // Additional extended face-away logic can be added here
+                // For example: pauseVideo(), showAlert(), etc.
+            }
+            
+            drawResults(results) {
+                if (!results.detections || results.detections.length === 0) return;
+                
+                // Clear the canvas
+                canvasCtx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
+                
+                // For each detected face
+                for (const detection of results.detections) {
+                    // Draw bounding box
+                    const boundingBox = detection.boundingBox;
+                    const width = boundingBox.width * elements.canvas.width;
+                    const height = boundingBox.height * elements.canvas.height;
+                    const x = boundingBox.xCenter * elements.canvas.width - width / 2;
+                    const y = boundingBox.yCenter * elements.canvas.height - height / 2;
+                    
+                    canvasCtx.strokeStyle = '#00ff00';
+                    canvasCtx.lineWidth = 2;
+                    canvasCtx.strokeRect(x, y, width, height);
+                    
+                    // Draw keypoints if they exist
+                    if (detection.keypoints && Array.isArray(detection.keypoints)) {
+                        canvasCtx.fillStyle = '#ff0000';
+                        for (const keypoint of detection.keypoints) {
+                            const keypointX = keypoint.x * elements.canvas.width;
+                            const keypointY = keypoint.y * elements.canvas.height;
+                            
+                            canvasCtx.beginPath();
+                            canvasCtx.arc(keypointX, keypointY, 5, 0, 2 * Math.PI);
+                            canvasCtx.fill();
+                        }
+                    }
+                    
+                    // Draw confidence score
+                    const confidence = (detection.score && detection.score[0]) ? 
+                        detection.score[0] * 100 : 0;
+                    canvasCtx.fillStyle = '#ffffff';
+                    canvasCtx.font = '16px Arial';
+                    canvasCtx.fillText(
+                        `Confidence: ${confidence.toFixed(1)}%`,
+                        x,
+                        y - 10
+                    );
+                }
+            }
+            
+            getStats() {
+                const currentTime = Date.now();
+                const sessionDuration = (currentTime - state.sessionStartTime) / 1000;
+                
+                return {
+                    currentStatus: state.isFaceDetected ? 'Face detected' : 'No face detected',
+                    faceAwayEvents: state.faceAwayEvents,
+                    totalFaceAwayTime: state.totalFaceAwayTime / 1000, // in seconds
+                    averageFaceAwayTime: state.faceAwayEvents > 0 ? 
+                        state.totalFaceAwayTime / state.faceAwayEvents / 1000 : 0, // in seconds
+                    sessionDuration: sessionDuration // in seconds
+                };
+            }
+            
+            updateStatsDisplay() {
+                const stats = this.getStats();
+                
+                elements.faceAwayEvents.textContent = stats.faceAwayEvents;
+                elements.totalFaceAwayTime.textContent = stats.totalFaceAwayTime.toFixed(1) + ' sec';
+                elements.avgFaceAwayTime.textContent = stats.averageFaceAwayTime.toFixed(1) + ' sec';
+                elements.sessionDuration.textContent = stats.sessionDuration.toFixed(0) + ' sec';
+            }
+        }
+
+        // Set up event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            elements.startButton.addEventListener('click', async () => {
+                if (!detector) {
+                    detector = new FaceDetector();
+                    const initialized = await detector.initialize();
+                    
+                    if (initialized) {
+                        detector.start();
+                        elements.startButton.disabled = true;
+                        elements.stopButton.disabled = false;
+                    } else {
+                        alert('Failed to initialize face detection. Please check console for errors.');
+                    }
+                } else {
+                    detector.start();
+                    elements.startButton.disabled = true;
+                    elements.stopButton.disabled = false;
+                }
+            });
+            
+            elements.stopButton.addEventListener('click', () => {
+                if (detector) {
+                    detector.stop();
+                    elements.startButton.disabled = false;
+                    elements.stopButton.disabled = true;
+                }
+            });
+            
+            elements.statsButton.addEventListener('click', () => {
+                if (detector) {
+                    const stats = detector.getStats();
+                    console.log('Face detection stats:', stats);
+                    alert(`
+                        Face Away Events: ${stats.faceAwayEvents}
+                        Total Face Away Time: ${stats.totalFaceAwayTime.toFixed(1)} sec
+                        Average Face Away Duration: ${stats.averageFaceAwayTime.toFixed(1)} sec
+                        Session Duration: ${stats.sessionDuration.toFixed(0)} sec
+                    `);
+                } else {
+                    alert('Face detection not started yet.');
+                }
+            });
+            
+            elements.clearLogButton.addEventListener('click', () => {
+                errorLog.clear();
+            });
+            
+            // Initially disable stop button
+            elements.stopButton.disabled = true;
+        });
+
+        // Export functions and objects for testing
+        window.exportedObjects = {
+            detector,
+            errorLog,
+            state,
+            config
+        };
+    </script>
+</body>
+</html>
