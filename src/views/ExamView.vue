@@ -185,8 +185,7 @@ export default {
             console.log(res)
             console.log(proctoredData)
             const isFound = proctoredData.find(quiz => quiz.form === formId);
-            const isAvailable = this.isTimeFrame(isFound.start, isFound.end);
-            if (!isFound || !isAvailable) {
+            if (!isFound) {
                 this.$router.push({ name: 'NotFound' })
             } else {
                 // store form name
@@ -197,30 +196,44 @@ export default {
                         sheet: this.name,
                     });
                     if (response.data.status == 'Progress') {
-                        // get start and endtime and ensure it is within timeframe.
-                        // load form and corresponding time.
-                        const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
-                        const iframe = document.getElementById("examFrame");
+                        // check that the form is still accepting response.
+                        try {
+                            const response = await axios.get(`${serverUrl}/check-form/${formId}`);
 
-                        // Save form link
-                        localStorage.setItem("examLink", formLink);
-                        iframe.src = formLink;
+                            const { acceptingResponses, message } = response.data;
 
-                        // set Timer
-                        localStorage.setItem("currentTime", isFound.time)
+                            if (acceptingResponses) {
+                                // get start and endtime and ensure it is within timeframe.
+                                // load form and corresponding time.
+                                const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
+                                const iframe = document.getElementById("examFrame");
 
-                        // When the form finishes loading
-                        iframe.addEventListener('load', () => {
-                            this.loading = false;
-                            document.getElementById("exam-container").style.display = "flex";
+                                // Save form link
+                                localStorage.setItem("examLink", formLink);
+                                iframe.src = formLink;
 
-                            // Set start time if not already set
-                            if (!localStorage.getItem("examStartTime")) {
-                                localStorage.setItem("examStartTime", Date.now());
+                                // set Timer
+                                localStorage.setItem("currentTime", isFound.time)
+
+                                // When the form finishes loading
+                                iframe.addEventListener('load', () => {
+                                    this.loading = false;
+                                    document.getElementById("exam-container").style.display = "flex";
+
+                                    // Set start time if not already set
+                                    if (!localStorage.getItem("examStartTime")) {
+                                        localStorage.setItem("examStartTime", Date.now());
+                                    }
+                                    this.startTimer();
+                                    this.startMonitoring();
+                                });
+                            } else {
+                                Swal.fire("Error!", `This form is not receiving responses`, "error");
                             }
-                            this.startTimer();
-                            this.startMonitoring();
-                        });
+
+                        } catch (error) {
+                            Swal.fire("Error!", `This form can't be reached, let the exam owner know that they didn't publish it: ${error.message}.`, "error");
+                        }
                     } else {
                         Swal.fire("Test Unavailable!", `You have taken this test already`, "info");
                         return null;
