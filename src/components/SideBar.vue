@@ -11,7 +11,7 @@
                 <a class='text-light' href="https://paystack.com/pay/gn77uq85en"><small>Upgrade (Recommended: Starter)</small></a>
             </div>
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <router-link to="/app" class="link">
+                <router-link :to="{ name: 'dashboard' }" class="link">
                     <h6 class="m-0">Your quizzes ({{ quizLength }})</h6>
                 </router-link>
                 <button class="btn btn-sm btn-add-quiz" @click="addQuiz()"><i class="bi bi-plus"></i>Add</button>
@@ -106,6 +106,7 @@ export default {
                     <div style="margin-bottom: 15px;">
                         <label for="quizName" style="display: block; font-weight: 600; margin-bottom: 5px;">Quiz Name: <span style="color: #e74c3c;">*</span></label>
                         <input id="quizName" class="swal2-input" placeholder="Enter Quiz Name" value="${existingQuiz.name}" readonly style="width: 100%; margin: 5px 0;">
+                        <small style="color: #6c757d; font-size: 12px;">(Read only)</small>
                     </div>
 
                     <div style="margin-bottom: 15px;">

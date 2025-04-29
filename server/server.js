@@ -12,8 +12,7 @@ const qs = require('querystring');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const fs = require('fs').promises;
-const paystack = require('./paystack');
-const crypto = require('crypto');
+const { JSDOM } = require('jsdom');
 
 const app = express();
 app.use(express.json());
@@ -978,26 +977,44 @@ app.post('/send-welcome', async (req, res) => {
 /**
  * Manage User Subscribtions with Paystack.
 */
-async function subscribeUser(email, planCode) {
-    const response = await paystack.post('/subscription', {
-        customer: email,
-        plan: planCode
-    });
-
-    return response.data;
-}
-
-app.post('/paystack-webhook', (req, res) => {
-  const event = req.body;
-
+app.get('/check-form/:id', async (req, res) => {
+    const formId = req.params.id;
+    const baseFormUrl = `https://docs.google.com/forms/d/${formId}/closedform`
+    try {
+        // Replace /viewform with /closedform
+        const closedFormUrl = baseFormUrl.replace(/\/viewform$/, '/closedform');
     
-    if (event.event === 'charge.success') {
-        return res.sendStatus(200).redirect('https://proctored.peppubuild.com/app');
+        const response = await axios.get(closedFormUrl, {
+          maxRedirects: 0, // Prevent automatic redirects
+          validateStatus: status => status >= 200 && status < 400 // Don't throw on 3xx
+        });
+    
+        const isRedirectedToViewForm = response.status === 302 &&
+          response.headers.location &&
+          response.headers.location.includes('/viewform');
+    
+        const acceptingResponses = isRedirectedToViewForm;
+    
+        res.json({
+          acceptingResponses,
+          redirectedTo: response.headers.location || closedFormUrl,
+          message: acceptingResponses ? 'Form is open.' : 'Form is closed.'
+        });
+    
+      } catch (error) {
+        if (error.response) {
+          // Still handle non-redirect errors gracefully
+          res.json({
+            acceptingResponses: false,
+            message: 'Form is closed (non-redirect response).',
+            statusCode: error.response.status
+          });
+        } else {
+            res.status(500).json({ error: 'Failed to check form status' });
+            console.log({ error: 'Failed to check form status' });
+        }
     }
- 
-
-  // add posibility to redirect res.sendStatus(200).redirect();
-  res.sendStatus(200);
-});
+})
+  
 
 app.listen(3000, () => console.log('Server running on port 3000'));

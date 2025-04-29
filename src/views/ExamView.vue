@@ -25,7 +25,8 @@
 
         <!-- Exam container (hidden until iframe is ready) -->
         <div id="exam-container">
-            <h3 class="timer">Time Remaining: <span id="timer"></span></h3>
+            <h3 class="timer">Time Remaining: <span id="timer"></span></h3> <span class="timer"><button
+                    class="btn btn-primary" @click="leaveQuiz()"><i class="bi bi-plus"></i>Leave Quiz</button></span>
             <iframe id="examFrame"></iframe>
         </div>
     </div>
@@ -196,7 +197,7 @@ export default {
                         sheet: this.name,
                     });
                     if (response.data.status == 'Progress') {
-                       // get start and endtime and ensure it is within timeframe.
+                        // get start and endtime and ensure it is within timeframe.
                         // load form and corresponding time.
                         const formLink = `https://docs.google.com/forms/d/${formId}/viewform`;
                         const iframe = document.getElementById("examFrame");
@@ -210,20 +211,20 @@ export default {
 
                         // When the form finishes loading
                         iframe.addEventListener('load', () => {
-                                    this.loading = false;
-                                    document.getElementById("exam-container").style.display = "flex";
+                            this.loading = false;
+                            document.getElementById("exam-container").style.display = "flex";
 
-                                    // Set start time if not already set
-                                    if (!localStorage.getItem("examStartTime")) {
-                                        localStorage.setItem("examStartTime", Date.now());
-                                    }
-                                    this.startTimer();
-                                    this.startMonitoring();
-                                });
+                            // Set start time if not already set
+                            if (!localStorage.getItem("examStartTime")) {
+                                localStorage.setItem("examStartTime", Date.now());
+                            }
+                            this.startTimer();
+                            this.startMonitoring();
+                        });
                     } else {
                         Swal.fire("Test Unavailable!", `You have taken this test already`, "info");
                         return null;
-                    } 
+                    }
                 } catch (error) {
                     console.error('Error checking status:', error);
                     return null;
@@ -291,6 +292,28 @@ export default {
                 Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
             }
         },
+        async finishQuiz() {
+            localStorage.removeItem("currentTime");
+            localStorage.removeItem("examStartTime");
+            localStorage.removeItem("examLink");
+            try {
+                this.updateSheet(this.name, this.email);
+            } catch (err) {
+                Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
+            }
+            this.$router.push('/success')
+        },
+        async leaveQuiz() {
+            Swal.fire({
+                title: "Are you sure you want to leave this quiz? You won't be able to come back",
+                showCancelButton: true,
+                confirmButtonText: "Leave",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.finishQuiz();
+                }
+            });
+        },
         startTimer() {
             const startTime = parseInt(localStorage.getItem("examStartTime"));
             const duration = parseInt(localStorage.getItem("currentTime")) || 5; // Default 5 minutes
@@ -313,15 +336,7 @@ export default {
                     // send the email, fullname, and testinfo to googlesheet.
                     // I propose the user's fullname and email are saved to their localstorage in the mounted guard for exam.
                     // possibly pass it as a simple jwt token, no need to add secret and verifying in backend.
-                    localStorage.removeItem("currentTime");
-                    localStorage.removeItem("examStartTime");
-                    localStorage.removeItem("examLink");
-                    try {
-                        this.updateSheet(this.name, this.email)
-                    } catch (err) {
-                        Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
-                    }
-                    this.$router.push('/success')
+                    this.finishQuiz();
                 }
             }, 1000);
         },
