@@ -89,6 +89,7 @@ export default {
                         name: res.data.formName,
                         form: res.data.formId,
                         time: res.data.timeLimit,
+                        proctor: false,
                         type: "Google Form",
                         date: new Date().toISOString() // Store current date
                     };

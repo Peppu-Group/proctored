@@ -113,23 +113,15 @@ export default {
                         <label for="formId" style="display: block; font-weight: 600; margin-bottom: 5px;">Form ID: <span style="color: #e74c3c;">*</span></label>
                         <input id="formId" class="swal2-input" placeholder="Enter Form ID" value="${existingQuiz.form}" readonly style="width: 100%; margin: 5px 0; background-color: #f8f9fa;">
                         <small style="color: #6c757d; font-size: 12px;">(Read only)</small>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label for="quizTime" style="display: block; font-weight: 600; margin-bottom: 5px;">Time Limit (minutes): <span style="color: #e74c3c;">*</span></label>
-                        <input id="quizTime" type="number" class="swal2-input" placeholder="Enter Time in Minutes" value="${existingQuiz.time}" style="width: 100%; margin: 5px 0;">
-                    </div>
+                    </div>                  
                     
                     <div style="margin-bottom: 15px;">
-                        <label for="startDateTime" style="display: block; font-weight: 600; margin-bottom: 5px;">Start Date & Time:</label>
-                        <input id="startDateTime" type="datetime-local" class="swal2-input" style="width: 100%; margin: 5px 0;" min="${new Date().toISOString().slice(0, 16)}" value="${existingQuiz.startDateTime || ''}">
-                        <small style="color: #6c757d; font-size: 12px;">(When will this quiz be open to respondents)</small>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label for="endDateTime" style="display: block; font-weight: 600; margin-bottom: 5px;">End Date & Time:</label>
-                        <input id="endDateTime" type="datetime-local" class="swal2-input" style="width: 100%; margin: 5px 0;" min="${new Date().toISOString().slice(0, 16)}" value="${existingQuiz.endDateTime || ''}">
-                        <small style="color: #6c757d; font-size: 12px;">(When will this quiz be closed to respondents)</small>
+                        <label for="procType" style="display: block; font-weight: 600; margin-bottom: 5px;">Enable AI Proctoring: <span style="color: #e74c3c;">*</span></label>
+                        <select id="procType" class="swal2-select" style="width: 100%; margin: 5px 0;">
+                            <option value="True" ${existingQuiz.proctor === "true" ? "selected" : ""}>True</option>
+                            <option value="False" ${existingQuiz.proctor === "false" ? "selected" : ""}>False</option>
+                        </select>
+                        <small style="color: #6c757d; font-size: 12px;">(Enabling AI proctoring will monitor for eye and facial movements)</small>
                     </div>
 
                     <div style="margin-bottom: 15px;">
@@ -159,9 +151,6 @@ export default {
             });
 
             if (formValues) {
-                // add temporary data
-                const startDateTime = document.getElementById("startDateTime").value.trim();
-                const endDateTime = document.getElementById("endDateTime").value.trim();
 
                 // Update quiz details
                 const updatedQuiz = {
@@ -171,15 +160,6 @@ export default {
                     type: formValues.quizType,
                     date: new Date().toISOString() // Store current date
                 };
-
-                // Include optional fields if they have values
-                if (startDateTime) {
-                    updatedQuiz.start = startDateTime;
-                }
-
-                if (endDateTime) {
-                    updatedQuiz.end = endDateTime;
-                }
 
                 // Update the quiz details in the array
                 parsedQuizDetails[quizIndex] = updatedQuiz;
