@@ -304,7 +304,34 @@ export default {
                 Swal.fire("Error!", `An error occurred, could be your network connection: ${err}`, "error");
             }
         },
+        // This method cleans up all monitoring resources
+        stopMonitoring() {
+            // Set monitoring as inactive
+            this.monitoringActive = false;
+
+            // Clear all intervals
+            if (this.checkInterval) clearInterval(this.checkInterval);
+            if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+
+            // Close broadcast channel
+            if (this.broadcastChannel) this.broadcastChannel.close();
+
+            // Remove event listeners
+            document.removeEventListener('mousemove', this.updateUserActivity);
+            document.removeEventListener('keydown', this.updateUserActivity);
+            document.removeEventListener('click', this.updateUserActivity);
+            document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
+
+            // Remove context menu blocking
+            document.removeEventListener('contextmenu', this.contextMenuHandler);
+
+            // Remove beforeunload warning
+            window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+        },
         async finishQuiz() {
+            // Clean up all monitoring functionality
+            this.stopMonitoring();
+
             localStorage.removeItem("currentTime");
             localStorage.removeItem("examStartTime");
             localStorage.removeItem("examLink");
@@ -460,13 +487,14 @@ export default {
 
         // Set up visibility change listener
         setupVisibilityListener() {
-            document.addEventListener('visibilitychange', () => {
+            this.visibilityChangeHandler = () => {
                 if (document.hidden) {
                     this.logViolation('switched to another tab or window');
                 } else {
                     this.updateUserActivity();
                 }
-            });
+            };
+            document.addEventListener('visibilitychange', this.visibilityChangeHandler);
         },
 
         // Set up focus checks
@@ -487,19 +515,22 @@ export default {
 
         // Block context menu
         blockContextMenu() {
-            document.addEventListener('contextmenu', (e) => e.preventDefault());
+            this.contextMenuHandler = (e) => e.preventDefault();
+            document.addEventListener('contextmenu', this.contextMenuHandler);
         },
 
         // Set up beforeunload warning
         setupBeforeUnloadWarning() {
-            window.addEventListener('beforeunload', (e) => {
+            this.beforeUnloadHandler = (e) => {
                 if (this.monitoringActive) {
                     e.preventDefault();
                     e.returnValue = '';
                     return '';
                 }
-            });
+            };
+            window.addEventListener('beforeunload', this.beforeUnloadHandler);
         },
+
 
         // Check if user has been inactive
         checkUserActivity() {
@@ -567,20 +598,10 @@ export default {
             });
         }
     },
-    // Clean up when component is destroyed
+    // Modified beforeDestroy to use the new stopMonitoring method
     beforeDestroy() {
-        // Clear all intervals
-        if (this.checkInterval) clearInterval(this.checkInterval);
-        if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
-
-        // Close broadcast channel
-        if (this.broadcastChannel) this.broadcastChannel.close();
-
-        // Remove event listeners
-        document.removeEventListener('mousemove', this.updateUserActivity);
-        document.removeEventListener('keydown', this.updateUserActivity);
-        document.removeEventListener('click', this.updateUserActivity);
-    }
+        this.stopMonitoring();
+    },
 };
 </script>
   
