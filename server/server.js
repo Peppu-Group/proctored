@@ -12,7 +12,6 @@ const qs = require('querystring');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const fs = require('fs').promises;
-const { JSDOM } = require('jsdom');
 
 const app = express();
 app.use(express.json());
