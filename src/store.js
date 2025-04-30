@@ -50,8 +50,8 @@ const store = createStore({
         UPDATE_QUIZ(state, updatedQuiz) {
             const index = state.quizList.findIndex(quiz => quiz.form === updatedQuiz.form);
             if (index !== -1) {
-              // Replace the existing quiz with the updated one
-              state.quizList.splice(index, 1, updatedQuiz);
+                // Replace the existing quiz with the updated one
+                state.quizList.splice(index, 1, updatedQuiz);
             }
         }
     },
@@ -88,27 +88,22 @@ const store = createStore({
                         commit('setAccessToken', newToken);
                     }
                 } catch (err) {
-                    Swal.fire('An error occurred', `Failed to refresh access token: ${err}`, 'error');
+                    this.$router.push({ path: '/login' })
                 }
             } else {
                 // fetch refreshtoken from json file.
-                console.log('blah')
+                this.$router.push({ path: '/login' })
             }
         },
 
         async loadQuizList({ commit, state, dispatch }) {
-            const storedData = localStorage.getItem('quizDetails');
-            if (storedData) {
-                commit('setQuizList', JSON.parse(storedData));
-            } else {
-                await dispatch('initAccessToken');
-                try {
-                    const res = await axios.get(`${serverUrl}/get-proctored/${state.accessToken}`);
-                    const proctoredData = res.data.data;
-                    commit('setQuizList', proctoredData);
-                } catch (err) {
-                    // Swal.fire("We couldn't get your quiz!", `This could be because you have no quiz, or from your network connection`, "info");
-                }
+            await dispatch('initAccessToken');
+            try {
+                const res = await axios.get(`${serverUrl}/get-proctored/${state.accessToken}`);
+                const proctoredData = res.data.data;
+                commit('setQuizList', proctoredData);
+            } catch (err) {
+                // Swal.fire("We couldn't get your quiz!", `This could be because you have no quiz, or from your network connection`, "info");
             }
         },
 
@@ -128,7 +123,7 @@ const store = createStore({
             const isDuplicate = parsedQuizDetails.some(q =>
                 q.form === quizData.form || q.name.trim().toLowerCase() === quizData.name.trim().toLowerCase()
             );
-            
+
             if (isDuplicate) {
                 Swal.fire('Duplicate Found!', 'A quiz with this form ID or name already exists. Please edit the existing quiz or choose a different form.', 'info');
                 return;
@@ -206,7 +201,8 @@ const store = createStore({
 
             try {
                 await axios.post(`${serverUrl}/edit-quiz/${state.accessToken}`, {
-                    updatedProctoredData: state.quizList});
+                    updatedProctoredData: state.quizList
+                });
                 // Show success message
                 Swal.fire("Success!", "Quiz details updated!", "success");
             } catch (err) {

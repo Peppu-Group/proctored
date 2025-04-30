@@ -178,7 +178,6 @@ export default {
     async mounted() {
         await this.verifyToken(); // verify that token is present and return email. wrap this in a if token is available.
         const formId = this.$route.params.id;
-        await this.$store.dispatch('initAccessToken');
         try {
             const res = await axios.get(`${serverUrl}/validate-link/${this.useremail}`);
             const proctoredData = res.data.data;
