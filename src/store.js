@@ -167,6 +167,8 @@ const store = createStore({
             await dispatch('initAccessToken');
 
             const accessToken = state.accessToken;
+            commit('removeQuiz', formIdToDelete);
+            commit('setCurrentQuiz', null);
             const updatedProctoredData = state.quizList;
 
             Swal.fire({
@@ -182,9 +184,6 @@ const store = createStore({
                     sheetName,
                     updatedProctoredData,
                 });
-
-                commit('removeQuiz', formIdToDelete);
-                commit('setCurrentQuiz', null);
 
                 // Clear related localStorage
                 Swal.fire('Deleted!', 'The quiz has been removed.', 'success');
