@@ -35,8 +35,6 @@ const store = createStore({
         },
         addQuiz(state, newQuiz) {
             state.quizList.push(newQuiz);
-            console.log(state.quizList)
-            console.log('abc')
             state.quizLength = state.quizList.length;
             localStorage.setItem('quizDetails', JSON.stringify(state.quizList));
         },
@@ -134,6 +132,8 @@ const store = createStore({
             if (!isDuplicate) {
                 parsedQuizDetails.push(quizData);
                 commit('setQuizList', parsedQuizDetails);
+                console.log(state.quizList)
+                console.log(parsedQuizDetails)
                 let bodyData = [quizData];
                 let sheetName = quizData.name;
 
