@@ -35,6 +35,7 @@ const store = createStore({
         },
         addQuiz(state, newQuiz) {
             state.quizList.push(newQuiz);
+            console.log(state.quizList)
             state.quizLength = state.quizList.length;
             localStorage.setItem('quizDetails', JSON.stringify(state.quizList));
         },
