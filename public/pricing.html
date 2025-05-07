@@ -246,7 +246,13 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm">Up to 10 students</span>
+            <span class="text-sm">Up to 10 concurrent students</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Unlimited students</span>
           </li>
           <li class="flex">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -274,7 +280,7 @@
         <h3 class="text-xl font-medium mb-2">Standard</h3>
         <p class="text-gray-400 text-sm mb-6">For educators and small teams</p>
         <div class="flex items-baseline mb-8">
-          <span class="text-4xl font-bold currency-display" id="standard-price" data-usd="10" data-naira="12000">$10</span>
+          <span class="text-4xl font-bold currency-display" id="standard-price" data-usd="10" data-naira="12000">$6.5</span>
           <span class="text-gray-400 ml-2" id="standard-period">/ month</span>
         </div>
         
@@ -283,7 +289,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm">10 exams</span>
+            <span class="text-sm">20 concurrent students</span>
           </li>
           <li class="flex">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -295,23 +301,35 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
+            <span class="text-sm">Unlimited exams</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
             <span class="text-sm">Advanced proctoring</span>
           </li>
           <li class="flex">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm">Basic reporting & analytics</span>
+            <span class="text-sm">Advanced reporting & analytics</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Dedicated support team</span>
           </li>
           <li class="flex" id="standard-yearly-savings" style="display:none;">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm text-blue-400" id="standard-savings-text">Save $24 yearly</span>
+            <span class="text-sm text-blue-400" id="standard-savings-text">Save 20% yearly</span>
           </li>
         </ul>
         
-        <button class="btn btn-primary w-full">Get Started</button>
+        <button class="btn btn-primary w-full" onclick="payPopular()">Get Started</button>
       </div>
       
       <!-- Enterprise Plan -->
@@ -329,13 +347,19 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm" id="enterprise-exam-text">For <span id="enterprise-exam-count">100</span> students</span>
+            <span class="text-sm" id="enterprise-exam-text">For <span id="enterprise-exam-count">100</span>concurrent students</span>
           </li>
           <li class="flex">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span class="text-sm">Unlimited exams</span>
+          </li>
+          <li class="flex">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm">Unlimited students</span>
           </li>
           <li class="flex">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -359,11 +383,11 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm text-blue-400" id="enterprise-savings-text">Save $60 yearly</span>
+            <span class="text-sm text-blue-400" id="enterprise-savings-text">Save 20% yearly</span>
           </li>
         </ul>
         
-        <button class="btn btn-primary w-full">Get Started</button>
+        <button class="btn btn-primary w-full">Contact Us</button>
       </div>
     </div>
     
@@ -376,7 +400,7 @@
           <h3 class="text-xl font-medium mb-2">What is included in the free trial?</h3>
           <p class="text-gray-300">
             Our 7-day free trial gives you access to all features including proctoring, monitoring, reporting, 
-            and analytics. You can create and publish one monitored exam for up to 10 students.
+            and analytics. You can create and publish one monitored exam for up to 10 concurrent students.
           </p>
         </div>
         
@@ -429,7 +453,7 @@
       let examCount = 100;
       let billingPeriod = 'monthly';
       let currency = 'dollar'; // 'dollar' or 'naira'
-      const exchangeRate = 1200; // 1 USD = 1200 Naira (example rate)
+      const exchangeRate = 1538; // 1 USD = 1500 Naira (example rate)
       
       // Initialize slider
       const slider = document.getElementById('slider');
@@ -495,7 +519,7 @@
       
       // Standard Plan pricing
       function getStandardPrice() {
-        const basePrice = 10; // Fixed standard plan price
+        const basePrice = 6.5; // Fixed standard plan price
         
         // Apply yearly discount if applicable
         if (billingPeriod === 'yearly') {
@@ -571,7 +595,7 @@
         
         enterprisePrice.textContent = formatCurrency(displayPrice, currency);
         enterprisePeriod.textContent = billingPeriod === 'monthly' ? '/ month' : '/ year';
-        enterpriseSavingsText.textContent = `Save ${formatCurrency(getEnterpriseSavings(), currency)} yearly`;
+        enterpriseSavingsText.textContent = `Save 20% yearly`;
       }
       
       function updateCurrencyDisplay() {
@@ -597,6 +621,21 @@
       // Initialize prices
       updateAllPrices();
     })
+    // payment plan for popular
+    function payPopular() {
+        const billingPeriod = document.querySelector('#tab-yearly.active') ? 'yearly' : 'monthly';
+        const currency = document.querySelector('#tab-naira.active') ? 'naira' : 'dollar';
+        
+        if (billingPeriod === 'monthly' && currency === 'naira') {
+          window.location.replace("https://paystack.com/pay/proctored-monthly");
+        } else if (billingPeriod === 'yearly' && currency === 'naira') {
+          window.location.replace("https://paystack.com/pay/proctored-yearly");
+        } else if (billingPeriod === 'monthly' && currency === 'dollar') {
+          console.log('monthly dollars');
+        } else if (billingPeriod === 'yearly' && currency === 'dollar') {
+          console.log('yearly dollars');
+        }
+      }
   </script>
   </body>
   </html>
