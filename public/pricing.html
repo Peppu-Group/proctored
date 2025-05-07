@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -195,9 +194,16 @@
       </p>
     </div>
     
-    <!-- Pricing tabs -->
+    <!-- Currency and Billing tabs -->
     <div class="max-w-3xl mx-auto mb-12">
-      <div class="text-center mb-8">
+      <div class="text-center mb-8 space-y-4">
+        <!-- Currency tabs -->
+        <div class="tabs mb-4">
+          <div class="tab active" id="tab-dollar">USD ($)</div>
+          <div class="tab" id="tab-naira">Naira (₦)</div>
+        </div>
+        
+        <!-- Billing period tabs -->
         <div class="tabs">
           <div class="tab active" id="tab-monthly">Monthly</div>
           <div class="tab" id="tab-yearly">Yearly <span class="ml-1.5 rounded-full bg-primary/20 px-2 py-0.5 text-xs">Save 20%</span></div>
@@ -205,7 +211,7 @@
       </div>
       
       <div class="flex flex-col items-center mb-8">
-        <label class="text-lg mb-2">Number of Students Concurrently: <span id="exam-count">1</span></label>
+        <label class="text-lg mb-2">Number of Students Concurrently: <span id="exam-count">100</span></label>
         <div class="w-full max-w-md">
           <div id="slider" class="my-4"></div>
           <div class="flex justify-between text-sm text-gray-400 px-2">
@@ -225,7 +231,7 @@
         <h3 class="text-xl font-medium mb-2">Free Trial</h3>
         <p class="text-gray-400 text-sm mb-6">Get started with our 7-day trial</p>
         <div class="flex items-baseline mb-8">
-          <span class="text-4xl font-bold">$0</span>
+          <span class="text-4xl font-bold currency-display" data-usd="0" data-naira="0">$0</span>
           <span class="text-gray-400 ml-2">/ 7 days</span>
         </div>
         
@@ -268,8 +274,8 @@
         <h3 class="text-xl font-medium mb-2">Standard</h3>
         <p class="text-gray-400 text-sm mb-6">For educators and small teams</p>
         <div class="flex items-baseline mb-8">
-          <span class="text-4xl font-bold" id="price">$10</span>
-          <span class="text-gray-400 ml-2" id="period">/ month</span>
+          <span class="text-4xl font-bold currency-display" id="standard-price" data-usd="10" data-naira="12000">$10</span>
+          <span class="text-gray-400 ml-2" id="standard-period">/ month</span>
         </div>
         
         <ul class="space-y-3 mb-8">
@@ -277,7 +283,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm" id="exam-text">1 exam</span>
+            <span class="text-sm">10 exams</span>
           </li>
           <li class="flex">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -297,24 +303,25 @@
             </svg>
             <span class="text-sm">Basic reporting & analytics</span>
           </li>
-          <li class="flex" id="yearly-savings" style="display:none;">
+          <li class="flex" id="standard-yearly-savings" style="display:none;">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm text-blue-400" id="savings-text">Save $20 yearly</span>
+            <span class="text-sm text-blue-400" id="standard-savings-text">Save $24 yearly</span>
           </li>
         </ul>
         
         <button class="btn btn-primary w-full">Get Started</button>
       </div>
       
-      <!-- Premium Plan -->
+      <!-- Enterprise Plan -->
       <div class="card group">
         <div class="card-highlight"></div>
         <h3 class="text-xl font-medium mb-2">Enterprise</h3>
         <p class="text-gray-400 text-sm mb-6">For institutions & large teams</p>
         <div class="flex items-baseline mb-8">
-          <span class="text-4xl font-bold">Custom</span>
+          <span class="text-4xl font-bold currency-display" id="enterprise-price" data-usd="25" data-naira="30000">$25</span>
+          <span class="text-gray-400 ml-2" id="enterprise-period">/ month</span>
         </div>
         
         <ul class="space-y-3 mb-8">
@@ -322,13 +329,13 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm">Unlimited exams</span>
+            <span class="text-sm" id="enterprise-exam-text">For <span id="enterprise-exam-count">100</span> students</span>
           </li>
           <li class="flex">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-sm">Unlimited students</span>
+            <span class="text-sm">Unlimited exams</span>
           </li>
           <li class="flex">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -348,9 +355,15 @@
             </svg>
             <span class="text-sm">Dedicated support team</span>
           </li>
+          <li class="flex" id="enterprise-yearly-savings" style="display:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-sm text-blue-400" id="enterprise-savings-text">Save $60 yearly</span>
+          </li>
         </ul>
         
-        <button class="btn btn-outline w-full">Contact Sales</button>
+        <button class="btn btn-primary w-full">Get Started</button>
       </div>
     </div>
     
@@ -378,16 +391,15 @@
         <div class="card">
           <h3 class="text-xl font-medium mb-2">What payment methods do you accept?</h3>
           <p class="text-gray-300">
-            We accept all major credit cards, PayPal, and bank transfers for annual plans. 
+            We accept all major credit cards, PayPal, and bank transfers for annual plans. For Naira payments, we also accept bank transfers and local payment methods.
             Enterprise customers may also pay by invoice.
           </p>
         </div>
         
         <div class="card">
-          <h3 class="text-xl font-medium mb-2">How does the exam pricing work?</h3>
+          <h3 class="text-xl font-medium mb-2">How does the student pricing work?</h3>
           <p class="text-gray-300">
-            Our pricing is based on the number of exams you need to administer. Each exam can have an unlimited 
-            number of students taking it. The more exams you purchase, the lower the price per exam.
+            Our Enterprise pricing is based on the number of students who can take exams concurrently. The more students you need to support simultaneously, the higher the price. Each plan comes with different features tailored to your needs.
           </p>
         </div>
       </div>
@@ -416,6 +428,8 @@
       // Initialize variables
       let examCount = 100;
       let billingPeriod = 'monthly';
+      let currency = 'dollar'; // 'dollar' or 'naira'
+      const exchangeRate = 1200; // 1 USD = 1200 Naira (example rate)
       
       // Initialize slider
       const slider = document.getElementById('slider');
@@ -433,65 +447,156 @@
       slider.noUiSlider.on('update', function(values) {
         examCount = Math.round(parseFloat(values[0]));
         document.getElementById('exam-count').textContent = examCount;
-        updatePrice();
+        document.getElementById('enterprise-exam-count').textContent = examCount;
+        updateEnterprisePrice();
       });
       
-      // Tab switching
+      // Currency tab switching
+      const tabDollar = document.getElementById('tab-dollar');
+      const tabNaira = document.getElementById('tab-naira');
+      
+      tabDollar.addEventListener('click', function() {
+        tabDollar.classList.add('active');
+        tabNaira.classList.remove('active');
+        currency = 'dollar';
+        updateAllPrices();
+      });
+      
+      tabNaira.addEventListener('click', function() {
+        tabNaira.classList.add('active');
+        tabDollar.classList.remove('active');
+        currency = 'naira';
+        updateAllPrices();
+      });
+      
+      // Billing period tab switching
       const tabMonthly = document.getElementById('tab-monthly');
       const tabYearly = document.getElementById('tab-yearly');
-      const yearlySavings = document.getElementById('yearly-savings');
+      const standardYearlySavings = document.getElementById('standard-yearly-savings');
+      const enterpriseYearlySavings = document.getElementById('enterprise-yearly-savings');
       
       tabMonthly.addEventListener('click', function() {
         tabMonthly.classList.add('active');
         tabYearly.classList.remove('active');
         billingPeriod = 'monthly';
-        yearlySavings.style.display = 'none';
-        updatePrice();
+        standardYearlySavings.style.display = 'none';
+        enterpriseYearlySavings.style.display = 'none';
+        updateAllPrices();
       });
       
       tabYearly.addEventListener('click', function() {
         tabYearly.classList.add('active');
         tabMonthly.classList.remove('active');
         billingPeriod = 'yearly';
-        yearlySavings.style.display = 'flex';
-        updatePrice();
+        standardYearlySavings.style.display = 'flex';
+        enterpriseYearlySavings.style.display = 'flex';
+        updateAllPrices();
       });
       
-      // Price calculation
-      function getBasePricePerExam() {
-        if (examCount <= 100) return 4;
-        if (examCount <= 300) return 5;
-        if (examCount <= 550) return 6;
-        return 7;
-      }
-      
-      function getPrice() {
-        const basePrice = getBasePricePerExam();
-        return billingPeriod === 'yearly' ? basePrice * 10 : basePrice;
-      }
-      
-      function getSavings() {
+      // Standard Plan pricing
+      function getStandardPrice() {
+        const basePrice = 10; // Fixed standard plan price
+        
+        // Apply yearly discount if applicable
         if (billingPeriod === 'yearly') {
-          return getBasePricePerExam() * examCount * 2;
+          return basePrice * 10; // 10 months for yearly (2 months free)
+        }
+        
+        return basePrice;
+      }
+      
+      // Enterprise Plan pricing based on exam count
+      function getEnterprisePrice() {
+        let basePrice;
+        
+        // Base price depends on student count
+        if (examCount <= 100) return 25;
+        if (examCount <= 300) return 50;
+        if (examCount <= 550) return 75;
+        return 100;
+      }
+      
+      function getStandardSavings() {
+        if (billingPeriod === 'yearly') {
+          return currency === 'dollar' ? 24 : 24 * exchangeRate;
         }
         return 0;
       }
       
-      function updatePrice() {
-        const price = document.getElementById('price');
-        const period = document.getElementById('period');
-        const examText = document.getElementById('exam-text');
-        const savingsText = document.getElementById('savings-text');
-        
-        price.textContent = '$' + getPrice();
-        period.textContent = billingPeriod === 'monthly' ? '/ month' : '/ year';
-        examText.textContent = examCount === 1 ? '1 exam' : `${examCount} exams`;
-        savingsText.textContent = `Save $${getSavings()} yearly`;
+      function getEnterpriseSavings() {
+        if (billingPeriod === 'yearly') {
+          const basePrice = getEnterprisePrice();
+          return currency === 'dollar' ? basePrice * 2.4 : basePrice * 2.4 * exchangeRate;
+        }
+        return 0;
       }
       
-      // Initialize price
-      updatePrice();
-    });
+      function formatCurrency(amount, currencyType) {
+        if (currencyType === 'dollar') {
+          return '$' + amount;
+        } else {
+          return '₦' + amount.toLocaleString();
+        }
+      }
+      
+      function updateAllPrices() {
+        updateStandardPrice();
+        updateEnterprisePrice();
+        updateCurrencyDisplay();
+      }
+      
+      function updateStandardPrice() {
+        const standardPrice = document.getElementById('standard-price');
+        const standardPeriod = document.getElementById('standard-period');
+        const standardSavingsText = document.getElementById('standard-savings-text');
+        
+        const price = getStandardPrice();
+        const priceCurrency = currency === 'dollar' ? price : price * exchangeRate;
+        
+        standardPrice.textContent = formatCurrency(priceCurrency, currency);
+        standardPeriod.textContent = billingPeriod === 'monthly' ? '/ month' : '/ year';
+        standardSavingsText.textContent = `Save ${formatCurrency(getStandardSavings(), currency)} yearly`;
+      }
+      
+      function updateEnterprisePrice() {
+        const enterprisePrice = document.getElementById('enterprise-price');
+        const enterprisePeriod = document.getElementById('enterprise-period');
+        const enterpriseSavingsText = document.getElementById('enterprise-savings-text');
+        
+        const price = getEnterprisePrice();
+        const priceCurrency = currency === 'dollar' ? price : price * exchangeRate;
+        
+        // Apply yearly discount if applicable
+        const displayPrice = billingPeriod === 'yearly' ? priceCurrency * 10 : priceCurrency;
+        
+        enterprisePrice.textContent = formatCurrency(displayPrice, currency);
+        enterprisePeriod.textContent = billingPeriod === 'monthly' ? '/ month' : '/ year';
+        enterpriseSavingsText.textContent = `Save ${formatCurrency(getEnterpriseSavings(), currency)} yearly`;
+      }
+      
+      function updateCurrencyDisplay() {
+        const currencyElements = document.querySelectorAll('.currency-display');
+        
+        currencyElements.forEach(element => {
+          if (element.id === 'standard-price' || element.id === 'enterprise-price') {
+            // These are handled by their own update functions
+            return;
+          }
+          
+          const usdValue = parseFloat(element.getAttribute('data-usd'));
+          const nairaValue = parseFloat(element.getAttribute('data-naira'));
+          
+          if (currency === 'dollar') {
+            element.textContent = ' $ 0 ';
+          } else {
+            element.textContent = '₦' + nairaValue.toLocaleString();
+          }
+        });
+      }
+      
+      // Initialize prices
+      updateAllPrices();
+    })
   </script>
-</body>
-</html>
+  </body>
+  </html>
