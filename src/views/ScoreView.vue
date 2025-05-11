@@ -75,7 +75,7 @@
 import SideBar from '../components/SideBar.vue';
 import axios from 'axios';
 import { createQuiz } from '@/utils/swalQuiz';
-const serverUrl = `https://proctored.server.peppubuild.com`;
+const serverUrl = `https://proctoredserver.peppubuild.com`;
 
 export default {
     name: 'ScoreView',

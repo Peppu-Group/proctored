@@ -150,7 +150,7 @@ li {
   
 <script>
 import axios from 'axios';
-const serverUrl = `https://proctored.server.peppubuild.com`;
+const serverUrl = `https://proctoredserver.peppubuild.com`;
 
 export default {
     name: 'ExamView',

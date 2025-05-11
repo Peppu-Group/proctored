@@ -34,7 +34,7 @@
 <script>
 import SideBar from '../components/SideBar.vue';
 import axios from 'axios';
-const serverUrl = `https://proctored.server.peppubuild.com`;
+const serverUrl = `https://proctoredserver.peppubuild.com`;
 const frontUrl = `https://proctored.peppubuild.com`;
 
 export default {
@@ -82,7 +82,7 @@ export default {
         },
         async verifyToken(token) {
             try {
-                const res = await axios.post('https://proctored.server.peppubuild.com/verify-token', { token });
+                const res = await axios.post('https://proctoredserver.peppubuild.com/verify-token', { token });
 
                 if (res.data.valid) {
                     const quizData = {

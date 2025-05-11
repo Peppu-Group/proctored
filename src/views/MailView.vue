@@ -32,7 +32,7 @@
 <script>
 import SideBar from '../components/SideBar.vue';
 import axios from 'axios';
-const serverUrl = `https://proctored.server.peppubuild.com`;
+const serverUrl = `https://proctoredserver.peppubuild.com`;
 const frontUrl = `https://proctored.peppubuild.com`;
 
 export default {

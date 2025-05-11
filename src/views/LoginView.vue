@@ -68,7 +68,7 @@ h1 {
 
 <script>
 import qs from 'querystring';
-const serverUrl = `https://proctored.server.peppubuild.com`;
+const serverUrl = `https://proctoredserver.peppubuild.com`;
 import axios from 'axios';
 
 export default {
@@ -134,7 +134,7 @@ export default {
             const OAUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?` +
                 qs.stringify({
                     client_id: '890175963480-aqtb14i2tmu2m32fr035r03knncdtout.apps.googleusercontent.com',
-                    redirect_uri: 'https://proctored.server.peppubuild.com/oauth2callback',
+                    redirect_uri: 'https://proctoredserver.peppubuild.com/oauth2callback',
                     response_type: 'code',
                     scope: 'openid profile email https://www.googleapis.com/auth/drive.file',
                     access_type: 'offline',  // Request offline access for refresh token
