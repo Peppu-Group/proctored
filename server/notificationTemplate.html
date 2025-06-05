@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #1e40af;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin: -30px -30px 20px -30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .notification-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .notification-table th {
+            background-color: #e9ecef;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #495057;
+        }
+        .notification-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .notification-table tr:last-child td {
+            border-bottom: none;
+        }
+        .priority-high {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .contact-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>{{companyName}} Notification</h1>
+        </div>
+        
+        <p>Dear <strong>{{recipient_name}}</strong>,</p>
+        
+        <p>{{greeting_message}}</p>
+        
+        <table class="notification-table">
+            <thead>
+                <tr>
+                    <th colspan="2">{{notification_type}} Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Common fields -->
+                <!-- Task-specific fields (show when notification_type contains "Task") -->
+                {{#if_task_notification}}
+                <tr>
+                    <td><strong>Task Name:</strong></td>
+                    <td>{{task_name}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Due Date:</strong></td>
+                    <td><span class="priority-high">{{due_date}}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Assigned By:</strong></td>
+                    <td>{{assigned_by}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Description:</strong></td>
+                    <td>{{task_description}}</td>
+                </tr>
+                {{/if_task_notification}}
+                
+                <!-- Crew-specific fields (show when notification_type contains "Crew") -->
+                {{#if_crew_notification}}
+                <tr>
+                    <td><strong>Vessel Name:</strong></td>
+                    <td>{{vessel_name}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Embarkation Date:</strong></td>
+                    <td><span class="priority-high">{{embarkation_date}}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Assignment Duration:</strong></td>
+                    <td>{{assignment_duration}}</td>
+                </tr>
+                {{/if_crew_notification}}
+                
+                <!-- Additional common fields -->
+                <tr>
+                    <td><strong>Contact Person:</strong></td>
+                    <td>{{contact_person}}</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="contact-info">
+            <h3>Important Notes:</h3>
+            <p>{{additional_notes}}</p>
+            
+            <p><strong>Next Steps:</strong></p>
+            <ul>
+                {{#each action_items}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{companyName}} Operations Center</strong><br>
+            Email: {{operations_email}}<br>
+            Phone: {{operations_phone}}<br>
+            
+            <p><em>This is an automated notification from the MarineTech system. Please do not reply directly to this email. For any questions or concerns, contact your firm's operations center using the details above.</em></p>
+            
+            <p><small>Generated on {{timestamp}}</small></p>
+        </div>
+    </div>
+</body>
+</html>

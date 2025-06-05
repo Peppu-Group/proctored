@@ -12,6 +12,7 @@ const qs = require('querystring');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const fs = require('fs').promises;
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 app.use(express.json());
@@ -28,6 +29,43 @@ const {
 const SECRET_KEY = process.env.SECRET_KEY;
 const serviceAccountEmail = 'proctor-peppubuild@proctor-peppubuild.iam.gserviceaccount.com'; // Replace with your service account email
 
+const transporter = nodemailer.createTransport({
+    host: process.env.HOST,
+    port: 465, // Use 587 for TLS/STARTTLS
+    secure: true, // true for port 465 (SSL), false for port 587 (TLS)
+    auth: {
+        user: 'users@peppubuild.com', // Your Namecheap Private Email address
+        pass: process.env.PASSWORD // Your email account password
+    }
+});
+
+app.post('/promptai', async (req, res) => {
+    let userReq = req.body.userReq;
+    // let userReq = "I want a portfolio website's home page"
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.AI_TOKEN); // Make sure you have GOOGLE_API_KEY environment variable set
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+        const prompt = `
+      Generate a detailed marine maintenance to-do list, covering tasks for ${userReq} maintenance. 
+      Include checks, inspections, cleaning, repairs, and replacements. 
+      Organize it for a typical small to medium-sized vessel. 
+      Format the output as an array, where each item in the list is a dictionary with the keys 'id', 'text', 'completed: false'. 
+      Do not include any code explanation before or after the for loop. 
+      The response should only contain the loop as a text, without code inscriptions, just tasks.
+      `;
+
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
+
+
+        res.send({ result: responseText });
+
+    } catch (error) {
+        console.error("Error generating content:", error);
+        res.status(500).send("An error occurred while generating the content.");
+    }
+});
 
 /**
   * This function authenticates the user for their Google Drive account.
@@ -141,57 +179,57 @@ app.get('/get-quiz-scores/:formId/:accessToken', async (req, res) => {
 
     const auth = new OAuth2Client();
     auth.setCredentials({ access_token: accessToken });
-  
+
     try {
-      const forms = google.forms({ version: 'v1', auth });
-  
-      const response = await forms.forms.responses.list({
-        formId: formId,
-      });
-  
-      const responses = response.data.responses || [];
-  
-      const result = responses.map(resp => {
-        let email = 'Unavailable';
-        let score = 'Unavailable';
-  
-        // Find email inside answers
-        if (resp.answers) {
-          for (const questionId in resp.answers) {
-            const answer = resp.answers[questionId];
-            const textAnswers = answer?.textAnswers?.answers || [];
-  
-            for (const singleAnswer of textAnswers) {
-              if (validateEmail(singleAnswer.value)) {
-                email = singleAnswer.value;
-                break;
-              }
+        const forms = google.forms({ version: 'v1', auth });
+
+        const response = await forms.forms.responses.list({
+            formId: formId,
+        });
+
+        const responses = response.data.responses || [];
+
+        const result = responses.map(resp => {
+            let email = 'Unavailable';
+            let score = 'Unavailable';
+
+            // Find email inside answers
+            if (resp.answers) {
+                for (const questionId in resp.answers) {
+                    const answer = resp.answers[questionId];
+                    const textAnswers = answer?.textAnswers?.answers || [];
+
+                    for (const singleAnswer of textAnswers) {
+                        if (validateEmail(singleAnswer.value)) {
+                            email = singleAnswer.value;
+                            break;
+                        }
+                    }
+                    if (email !== 'Unavailable') break; // Stop after finding the email
+                }
             }
-            if (email !== 'Unavailable') break; // Stop after finding the email
-          }
-        }
-  
-        // Find score (correct key is 'grade', not 'grading')
-        if (resp.grade) {
-          score = resp.grade.score ?? 'Unavailable';
-        }
-  
-        return { email, score };
-      });
-  
-      res.json(result);
-  
+
+            // Find score (correct key is 'grade', not 'grading')
+            if (resp.grade) {
+                score = resp.grade.score ?? 'Unavailable';
+            }
+
+            return { email, score };
+        });
+
+        res.json(result);
+
     } catch (error) {
-      console.error('Error fetching form scores:', error.message);
-      res.status(500).json({ error: 'Failed to retrieve quiz scores' });
+        console.error('Error fetching form scores:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve quiz scores' });
     }
 });
-  
-  // Helper function to validate email
-  function validateEmail(email) {
+
+// Helper function to validate email
+function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
-  }
+}
 
 app.post('/update-sheet', async (req, res) => {
     const { sheet: sheetName, email, violations } = req.body;
@@ -897,15 +935,6 @@ app.post('/send-mail', async (req, res) => {
     const useremail = req.body.useremail;
 
     const htmlContent = await getEmailTemplate(emailData, email, useremail);
-    const transporter = nodemailer.createTransport({
-        host: process.env.HOST,
-        port: 465, // Use 587 for TLS/STARTTLS
-        secure: true, // true for port 465 (SSL), false for port 587 (TLS)
-        auth: {
-            user: 'users@peppubuild.com', // Your Namecheap Private Email address
-            pass: process.env.PASSWORD // Your email account password
-        }
-    });
 
     const mailOptions = {
         from: '"Proctored by Peppubuild" <users@peppubuild.com>',
@@ -939,19 +968,204 @@ async function getWelcomeTemplate(name) {
     }
 }
 
+// Fixed version of your code
+
+// 1. Enhanced regex function to handle conditional blocks
+function fillTemplate(template, data) {
+    // First handle conditional blocks
+    template = template.replace(/{{#if_task_notification}}([\s\S]*?){{\/if_task_notification}}/g, (match, content) => {
+        return data.if_task_notification ? content : '';
+    });
+    
+    template = template.replace(/{{#if_crew_notification}}([\s\S]*?){{\/if_crew_notification}}/g, (match, content) => {
+        return data.if_crew_notification ? content : '';
+    });
+    
+    // Handle array loops for action_items
+    template = template.replace(/{{#each action_items}}([\s\S]*?){{\/each}}/g, (match, content) => {
+        if (data.action_items && Array.isArray(data.action_items)) {
+            return data.action_items.map(item => content.replace(/{{this}}/g, item)).join('');
+        }
+        return '';
+    });
+    
+    // Then handle simple variable replacements
+    return template.replace(/{{(.*?)}}/g, (_, key) => {
+        return data[key.trim()] ?? '';
+    });
+}
+
+function getCrewData(notificationData) {
+    const data = {
+        // Basic info
+        companyName: notificationData.companyName,
+        recipient_name: notificationData.name,
+        notification_type: "Crew Assignment", // Fixed: should be descriptive
+        greeting_message: "You have been assigned to a vessel. Please review your assignment details below.",
+        
+        // Conditional flags
+        if_crew_notification: true,
+        if_task_notification: false, // Important: set to false
+        
+        // Crew-specific fields
+        vessel_name: notificationData.id,
+        embarkation_date: notificationData.embarkation_date,
+        assignment_duration: notificationData.duration,
+        
+        // Common fields that were missing
+        contact_person: notificationData.contact_person,
+        additional_notes: "Please bring all required documents and certifications.",
+        action_items: ["Confirm travel arrangements", "Pack required gear", "Report to designated port"],
+        
+        // Operations contact info
+        operations_email: notificationData.operations_email,
+        operations_phone: notificationData.operations_phone,
+        timestamp: new Date().toLocaleString()
+    };
+    return data;
+}
+
+function getTaskData(notificationData) {
+    const data = {
+        // Basic info
+        companyName: notificationData.companyName,
+        recipient_name: notificationData.name,
+        notification_type: "Task Assignment", // Fixed: should be descriptive
+        greeting_message: "You have been assigned a new task that requires your attention.",
+        
+        // Conditional flags
+        if_task_notification: true,
+        if_crew_notification: false, // Important: set to false
+        
+        // Task-specific fields
+        task_name: notificationData.id,
+        due_date: notificationData.due_date,
+        assigned_by: notificationData.assigned_by,
+        task_description: notificationData.description,
+        
+        // Common fields that were missing
+        contact_person: notificationData.contact_person,
+        additional_notes: "Please confirm receipt and estimated completion time.",
+        action_items: ["Review task details", "Confirm availability", "Begin work"],
+        
+        // Operations contact info
+        operations_email: notificationData.operations_email,
+        operations_phone: notificationData.operations_phone,
+        timestamp: new Date().toLocaleString()
+    };
+    return data;
+}
+
+async function getNotificationTemplate(notificationData) {
+    try {
+        const filePath = path.join(__dirname, 'notificationTemplate.html');
+        let template = await fs.readFile(filePath, 'utf-8');
+
+        // Fixed: use === for comparison and check the right property
+        if (notificationData.notification_type === 'crew') {
+            let data = getCrewData(notificationData);
+            template = fillTemplate(template, data);
+        } else {
+            let data = getTaskData(notificationData);
+            template = fillTemplate(template, data);
+        }
+
+        return template;
+    } catch (error) {
+        console.error('Error reading email template:', error);
+        throw error;
+    }
+}
+
+async function sendNotificationMails(notificationData) {
+    const actions = {
+        task: "assigned a new task",
+        crew: "added to the crew",
+    };
+
+    const action = actions[notificationData.notification_type] || "notified";
+    
+    try {
+        const htmlContent = await getNotificationTemplate(notificationData);
+
+        const mailOptions = {
+            from: '"Notification from MarineTech" <users@peppubuild.com>',
+            to: notificationData.email,
+            subject: `You have been ${action}`,
+            html: htmlContent
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Email sending error:', error);
+                // res.send(error); // Remove if not in Express route
+            } else {
+                console.log('Email sent:', info.response);
+                // res.send(info.response); // Remove if not in Express route
+            }
+        });
+    } catch (error) { // Fixed: added error parameter
+        console.error('Error in sendNotificationMails:', error);
+    }
+}
+
+
+app.post('/notification', (req, res) => {
+    const notificationData = req.body;
+  console.log(notificationData)
+    // Send the email
+    sendNotificationMails(notificationData); 
+  
+    res.status(200).json({ message: 'Email sent successfully' });
+  });
+  
+
+function scheduleEmailReminder(dueDate, callback) {
+    const due = new Date(dueDate).getTime();
+    const now = Date.now();
+    const delay = due - 24 * 60 * 60 * 1000 - now;
+
+    if (delay <= 0) {
+        console.log("📩 Sending immediately (due in less than 24 hrs)");
+        callback();
+    } else {
+        console.log(`📅 Email will be sent in ${delay / 1000} seconds`);
+        setTimeout(callback, delay);
+    }
+}
+
+// Example usage:
+scheduleEmailReminder('2025-05-25T10:00:00Z', () => {
+    console.log("📧 Send email here");
+});
+
+async function sendReminderMails() {
+    try {
+        const htmlContent = await getReminderTemplate(req.body.name)
+
+        const mailOptions = {
+            from: '"Reminder from MarineTech" <users@peppubuild.com>',
+            to: req.body.email,
+            subject: `You have an Important Reminder from MarineTech`,
+            html: htmlContent
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                res.send(error);
+            } else {
+                res.send(info.response);
+            }
+        });
+    } catch {
+        console.error('Error reading email template:', error);
+    }
+}
+
+
 app.post('/send-welcome', async (req, res) => {
     try {
         const htmlContent = await getWelcomeTemplate(req.body.name)
-
-        const transporter = nodemailer.createTransport({
-            host: process.env.HOST,
-            port: 465, // Use 587 for TLS/STARTTLS
-            secure: true, // true for port 465 (SSL), false for port 587 (TLS)
-            auth: {
-                user: 'users@peppubuild.com', // Your Namecheap Private Email address
-                pass: process.env.PASSWORD // Your email account password
-            }
-        });
 
         const mailOptions = {
             from: '"Proctored by Peppubuild" <contact@peppubuild.com>',
@@ -982,38 +1196,38 @@ app.get('/check-form/:id', async (req, res) => {
     try {
         // Replace /viewform with /closedform
         const closedFormUrl = baseFormUrl.replace(/\/viewform$/, '/closedform');
-    
+
         const response = await axios.get(closedFormUrl, {
-          maxRedirects: 0, // Prevent automatic redirects
-          validateStatus: status => status >= 200 && status < 400 // Don't throw on 3xx
+            maxRedirects: 0, // Prevent automatic redirects
+            validateStatus: status => status >= 200 && status < 400 // Don't throw on 3xx
         });
-    
+
         const isRedirectedToViewForm = response.status === 302 &&
-          response.headers.location &&
-          response.headers.location.includes('/viewform');
-    
+            response.headers.location &&
+            response.headers.location.includes('/viewform');
+
         const acceptingResponses = isRedirectedToViewForm;
-    
+
         res.json({
-          acceptingResponses,
-          redirectedTo: response.headers.location || closedFormUrl,
-          message: acceptingResponses ? 'Form is open.' : 'Form is closed.'
+            acceptingResponses,
+            redirectedTo: response.headers.location || closedFormUrl,
+            message: acceptingResponses ? 'Form is open.' : 'Form is closed.'
         });
-    
-      } catch (error) {
+
+    } catch (error) {
         if (error.response) {
-          // Still handle non-redirect errors gracefully
-          res.json({
-            acceptingResponses: false,
-            message: 'Form is closed (non-redirect response).',
-            statusCode: error.response.status
-          });
+            // Still handle non-redirect errors gracefully
+            res.json({
+                acceptingResponses: false,
+                message: 'Form is closed (non-redirect response).',
+                statusCode: error.response.status
+            });
         } else {
             res.status(500).json({ error: 'Failed to check form status' });
             console.log({ error: 'Failed to check form status' });
         }
     }
 })
-  
+
 
 app.listen(3000, () => console.log('Server running on port 3000'));
