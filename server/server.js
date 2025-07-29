@@ -13,6 +13,7 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const fs = require('fs').promises;
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(express.json());
@@ -25,6 +26,10 @@ const {
     GOOGLE_CLIENT_SECRET,
     REDIRECT_URI
 } = process.env;
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const SECRET_KEY = process.env.SECRET_KEY;
 const serviceAccountEmail = 'proctor-peppubuild@proctor-peppubuild.iam.gserviceaccount.com'; // Replace with your service account email
@@ -968,6 +973,23 @@ async function getWelcomeTemplate(name) {
     }
 }
 
+async function getCertReminderTemplate(vesselName, certName) {
+    try {
+        const filePath = path.join(__dirname, 'certReminderTemplate.html');
+        let template = await fs.readFile(filePath, 'utf-8');
+
+        // Replace placeholders with actual data
+        template = template.replace('{{certName}}', certName);
+        template = template.replace('{{vesselName}}', vesselName);
+        template = template.replace('{{deadLine}}', '1 Day');
+
+        return template;
+    } catch (error) {
+        console.error('Error reading email template:', error);
+        throw error;
+    }
+}
+
 // Fixed version of your code
 
 // 1. Enhanced regex function to handle conditional blocks
@@ -976,11 +998,11 @@ function fillTemplate(template, data) {
     template = template.replace(/{{#if_task_notification}}([\s\S]*?){{\/if_task_notification}}/g, (match, content) => {
         return data.if_task_notification ? content : '';
     });
-    
+
     template = template.replace(/{{#if_crew_notification}}([\s\S]*?){{\/if_crew_notification}}/g, (match, content) => {
         return data.if_crew_notification ? content : '';
     });
-    
+
     // Handle array loops for action_items
     template = template.replace(/{{#each action_items}}([\s\S]*?){{\/each}}/g, (match, content) => {
         if (data.action_items && Array.isArray(data.action_items)) {
@@ -988,7 +1010,7 @@ function fillTemplate(template, data) {
         }
         return '';
     });
-    
+
     // Then handle simple variable replacements
     return template.replace(/{{(.*?)}}/g, (_, key) => {
         return data[key.trim()] ?? '';
@@ -1002,21 +1024,21 @@ function getCrewData(notificationData) {
         recipient_name: notificationData.name,
         notification_type: "Crew Assignment", // Fixed: should be descriptive
         greeting_message: "You have been assigned to a vessel. Please review your assignment details below.",
-        
+
         // Conditional flags
         if_crew_notification: true,
         if_task_notification: false, // Important: set to false
-        
+
         // Crew-specific fields
         vessel_name: notificationData.id,
         embarkation_date: notificationData.embarkation_date,
         assignment_duration: notificationData.duration,
-        
+
         // Common fields that were missing
         contact_person: notificationData.contact_person,
         additional_notes: "Please bring all required documents and certifications.",
         action_items: ["Confirm travel arrangements", "Pack required gear", "Report to designated port"],
-        
+
         // Operations contact info
         operations_email: notificationData.operations_email,
         operations_phone: notificationData.operations_phone,
@@ -1032,22 +1054,22 @@ function getTaskData(notificationData) {
         recipient_name: notificationData.name,
         notification_type: "Task Assignment", // Fixed: should be descriptive
         greeting_message: "You have been assigned a new task that requires your attention.",
-        
+
         // Conditional flags
         if_task_notification: true,
         if_crew_notification: false, // Important: set to false
-        
+
         // Task-specific fields
         task_name: notificationData.id,
         due_date: notificationData.due_date,
         assigned_by: notificationData.assigned_by,
         task_description: notificationData.description,
-        
+
         // Common fields that were missing
         contact_person: notificationData.contact_person,
         additional_notes: "Please confirm receipt and estimated completion time.",
         action_items: ["Review task details", "Confirm availability", "Begin work"],
-        
+
         // Operations contact info
         operations_email: notificationData.operations_email,
         operations_phone: notificationData.operations_phone,
@@ -1077,6 +1099,58 @@ async function getNotificationTemplate(notificationData) {
     }
 }
 
+// Function to get items expiring tomorrow
+async function getItemsExpiringTomorrow() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+    try {
+        const { data, error } = await supabase
+            .from('vessels')
+            .select('*')
+            .filter('certifications', 'cs', `[{"expiry_date": "${tomorrowStr}"}]`);
+
+        if (error) {
+            console.error('Error fetching expiring items:', error);
+            return [];
+        }
+
+        // Step 2: Extract only the certifications that actually expire tomorrow
+        const expiringCerts = [];
+        (data || []).forEach(vessel => {
+            (vessel.certifications || []).forEach(cert => {
+                if (cert.expiry_date === tomorrowStr) {
+                    expiringCerts.push({
+                        vesselName: vessel.name,
+                        certName: cert.name,
+                        email: cert.email // email is inside each certification
+                    });
+                }
+            });
+        });
+
+        return expiringCerts;
+    } catch (error) {
+        console.error('Database query failed:', error);
+        return [];
+    }
+}
+
+app.post('/certification/reminder', (req, res) => {
+    getItemsExpiringTomorrow().then((resp) => {
+        for (const data of resp) {
+            if (!data.email) continue;
+            sendReminderMails(data)
+        }
+        // console.log(res)
+        // sendReminderMails(data)
+    })
+
+    res.status(200).json({ message: 'Email sent successfully' });
+});
+
+
 async function sendNotificationMails(notificationData) {
     const actions = {
         task: "assigned a new task",
@@ -1084,7 +1158,7 @@ async function sendNotificationMails(notificationData) {
     };
 
     const action = actions[notificationData.notification_type] || "notified";
-    
+
     try {
         const htmlContent = await getNotificationTemplate(notificationData);
 
@@ -1112,40 +1186,20 @@ async function sendNotificationMails(notificationData) {
 
 app.post('/notification', (req, res) => {
     const notificationData = req.body;
-  console.log(notificationData)
+    console.log(notificationData)
     // Send the email
-    sendNotificationMails(notificationData); 
-  
+    sendNotificationMails(notificationData);
+
     res.status(200).json({ message: 'Email sent successfully' });
-  });
-  
-
-function scheduleEmailReminder(dueDate, callback) {
-    const due = new Date(dueDate).getTime();
-    const now = Date.now();
-    const delay = due - 24 * 60 * 60 * 1000 - now;
-
-    if (delay <= 0) {
-        console.log("📩 Sending immediately (due in less than 24 hrs)");
-        callback();
-    } else {
-        console.log(`📅 Email will be sent in ${delay / 1000} seconds`);
-        setTimeout(callback, delay);
-    }
-}
-
-// Example usage:
-scheduleEmailReminder('2025-05-25T10:00:00Z', () => {
-    console.log("📧 Send email here");
 });
 
-async function sendReminderMails() {
+async function sendReminderMails(data) {
     try {
-        const htmlContent = await getReminderTemplate(req.body.name)
+        const htmlContent = await getCertReminderTemplate(data.vesselName, data.certName)
 
         const mailOptions = {
             from: '"Reminder from MarineTech" <users@peppubuild.com>',
-            to: req.body.email,
+            to: data.email,
             subject: `You have an Important Reminder from MarineTech`,
             html: htmlContent
         };

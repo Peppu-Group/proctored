@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expiry Reminder</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .alert-badge {
+            display: inline-block;
+            background-color: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .reminder-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .reminder-table thead {
+            background-color: #f8f9fa;
+        }
+        .reminder-table th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .reminder-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        .reminder-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .reminder-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-expiring {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .status-overdue {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .item-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+        .action-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid #667eea;
+        }
+        .action-section h3 {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 16px;
+        }
+        .action-section p {
+            margin: 0;
+            color: #6c757d;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 12px;
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .content {
+                padding: 20px 15px;
+            }
+            .reminder-table {
+                font-size: 14px;
+            }
+            .reminder-table th,
+            .reminder-table td {
+                padding: 10px 8px;
+            }
+            .item-image {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📅 Expiry Reminder</h1>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="alert-badge">Action Required</div>
+            
+            <h2 style="color: #495057; margin: 0 0 15px 0;">Items Requiring Your Attention</h2>
+            <p style="color: #6c757d; margin-bottom: 25px;">
+                The item below is expiring soon. Please review and take necessary action.
+            </p>
+
+            <!-- Reminder Table -->
+            <table class="reminder-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Vessel</th>
+                        <th>Days Left</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <strong>{{certName}}</strong>
+                            </div>
+                        </td>
+                        <td>{{vesselName}}</td>
+                        <td style="font-weight: bold; color: #ff6b6b;">{{deadLine}}</td>
+                        <td><span class="status-badge status-expiring">Expiring Soon</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Action Section -->
+            <div class="action-section">
+                <h3>💡 What You Need To Do</h3>
+                <p>Review the item above and take appropriate action to renew or update before the expiry date. 
+                   Click on the item or contact the relevant department for renewal procedures.</p>
+            </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>📧 Automated Reminder System</strong></p>
+            <p>This notification was generated automatically</p>
+            <p>Please do not reply to this email. For support, contact your administrator.</p>
+        </div>
+    </div>
+</body>
+</html>
