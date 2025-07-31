@@ -990,6 +990,23 @@ async function getCertReminderTemplate(vesselName, certName) {
     }
 }
 
+async function getMaintenanceTemplate(vessel, component, assigned_to) {
+    try {
+        const filePath = path.join(__dirname, 'certReminderTemplate.html');
+        let template = await fs.readFile(filePath, 'utf-8');
+
+        // Replace placeholders with actual data
+        template = template.replace('{{certName}}', `${component}, Assigned To: ${assigned_to}`);
+        template = template.replace('{{vesselName}}', vessel);
+        template = template.replace('{{deadLine}}', '1 Day');
+
+        return template;
+    } catch (error) {
+        console.error('Error reading email template:', error);
+        throw error;
+    }
+}
+
 // Fixed version of your code
 
 // 1. Enhanced regex function to handle conditional blocks
@@ -1099,10 +1116,10 @@ async function getNotificationTemplate(notificationData) {
     }
 }
 
-// Function to get items expiring tomorrow
-async function getItemsExpiringTomorrow() {
+// Function to get certificate items expiring in 1 week
+async function getItemsExpiringWeek() {
     const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setDate(tomorrow.getDate() + 7);
     const tomorrowStr = tomorrow.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
     try {
@@ -1137,8 +1154,44 @@ async function getItemsExpiringTomorrow() {
     }
 }
 
-app.post('/certification/reminder', (req, res) => {
+async function getItemsExpiringTomorrow() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    try {
+        const { data, error: supabaseError } = await supabase
+            .from('tasks')
+            .select('component, vessel, assigned_to, email')
+            .eq('next_due', tomorrowStr);
+
+        if (supabaseError) {
+            console.error('Error fetching expiring items:', supabaseError);
+            return [];
+        }
+
+        return data ?? []; // always return array
+
+    } catch (err) {
+        console.error('Database query failed:', err);
+        return [];
+    }
+}
+
+
+app.post('/maintenance/reminder', (req, res) => {
     getItemsExpiringTomorrow().then((resp) => {
+        for (const data of resp) {
+            if (!data.email) continue;
+            sendMaintenanceMails(data)
+        }
+    })
+
+    res.status(200).json({ message: 'Email sent successfully' });
+});
+
+app.post('/certification/reminder', (req, res) => {
+    getItemsExpiringWeek().then((resp) => {
         for (const data of resp) {
             if (!data.email) continue;
             sendReminderMails(data)
@@ -1213,6 +1266,37 @@ async function sendReminderMails(data) {
         });
     } catch {
         console.error('Error reading email template:', error);
+    }
+}
+
+async function sendMaintenanceMails(data) {
+    try {
+        const htmlContent = await getMaintenanceTemplate(
+            data.vessel,
+            data.component,
+            data.assigned_to // fixed variable
+        );
+
+        const mailOptions = {
+            from: '"Reminder from MarineTech" <users@peppubuild.com>',
+            to: data.email,
+            subject: `You have an Important Reminder from MarineTech`,
+            html: htmlContent
+        };
+
+        return new Promise((resolve, reject) => {
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Error sending mail:', error);
+                    reject(error);
+                } else {
+                    resolve(info.response);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error generating email template:', error);
+        throw error;
     }
 }
 
