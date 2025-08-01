@@ -1216,7 +1216,7 @@ async function sendNotificationMails(notificationData) {
         const htmlContent = await getNotificationTemplate(notificationData);
 
         const mailOptions = {
-            from: '"Notification from MarineTech" <users@peppubuild.com>',
+            from: '"Notification from OceanHelm" <users@peppubuild.com>',
             to: notificationData.email,
             subject: `You have been ${action}`,
             html: htmlContent
@@ -1239,7 +1239,6 @@ async function sendNotificationMails(notificationData) {
 
 app.post('/notification', (req, res) => {
     const notificationData = req.body;
-    console.log(notificationData)
     // Send the email
     sendNotificationMails(notificationData);
 
@@ -1251,9 +1250,9 @@ async function sendReminderMails(data) {
         const htmlContent = await getCertReminderTemplate(data.vesselName, data.certName)
 
         const mailOptions = {
-            from: '"Reminder from MarineTech" <users@peppubuild.com>',
+            from: '"Reminder from OceanHelm" <users@peppubuild.com>',
             to: data.email,
-            subject: `You have an Important Reminder from MarineTech`,
+            subject: `You have an Important Reminder from OceanHelm`,
             html: htmlContent
         };
 
@@ -1269,6 +1268,29 @@ async function sendReminderMails(data) {
     }
 }
 
+app.post('/contact', (req, res) => {
+    try {
+        const mailOptions = {
+            from: '"Contact from OceanHelm" <users@peppubuild.com>',
+            to: data.email,
+            subject: `New Message from OceanHelm`,
+            html: `You have a new contact information, from ${req.fullname}, with email address: ${req.email}, and
+            message: ${req.message} 
+            `
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                res.send(error);
+            } else {
+                res.send(info.response);
+            }
+        });
+    } catch {
+        console.error('Error reading email template:', error);
+    }
+});
+
 async function sendMaintenanceMails(data) {
     try {
         const htmlContent = await getMaintenanceTemplate(
@@ -1278,9 +1300,9 @@ async function sendMaintenanceMails(data) {
         );
 
         const mailOptions = {
-            from: '"Reminder from MarineTech" <users@peppubuild.com>',
+            from: '"Reminder from OceanHelm" <users@peppubuild.com>',
             to: data.email,
-            subject: `You have an Important Reminder from MarineTech`,
+            subject: `You have an Important Reminder from OceanHelm`,
             html: htmlContent
         };
 
