@@ -1270,24 +1270,31 @@ async function sendReminderMails(data) {
 
 app.post('/contact', (req, res) => {
     try {
+        const { fullname, email, message } = req.body; 
+
         const mailOptions = {
             from: '"Contact from OceanHelm" <users@peppubuild.com>',
-            to: data.email,
+            to: "ukpaiugochiibem@gmail.com", // or use `email` if dynamic
             subject: `New Message from OceanHelm`,
-            html: `You have a new contact information, from ${req.fullname}, with email address: ${req.email}, and
-            message: ${req.message} 
+            html: `
+                <p><strong>Name:</strong> ${fullname}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Message:</strong> ${message}</p>
             `
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                res.send(error);
+                console.error('Error sending email:', error);
+                res.status(500).send('Email failed to send.');
             } else {
-                res.send(info.response);
+                console.log('Message sent:', info.response);
+                res.send('Email sent successfully.');
             }
         });
-    } catch {
-        console.error('Error reading email template:', error);
+    } catch (err) {
+        console.error('Error in /contact handler:', err);
+        res.status(500).send('Server error.');
     }
 });
 
