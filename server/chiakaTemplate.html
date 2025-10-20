@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP - Chiaka Ben-Obi @60</title>
+    <style>
+        /* Reset styles for better email client compatibility */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background-color: #f9f9f9;
+            color: #333;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        /* Main container */
+        .email-container {
+            width: 100% !important;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 2px solid #e6e6fa;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        /* Header section */
+        .header-section {
+            background: linear-gradient(135deg, #0d0d0c, #545453);
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .main-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d4af37;
+            margin: 0 0 10px 0;
+            letter-spacing: 1.5px;
+            line-height: 1.2;
+        }
+
+        .celebration-title {
+            font-size: 18px;
+            color: #d4af37;
+            font-style: italic;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        /* Content table - mobile responsive */
+        .content-table {
+            width: 100% !important;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .main-content {
+            padding: 20px;
+            background-color: #fefefe;
+            width: 100%;
+        }
+
+        /* Hero image - responsive */
+        .hero-image {
+            width: 100% !important;
+            max-width: 400px;
+            height: auto !important;
+            object-fit: cover;
+            margin: 10px auto 20px auto;
+            display: block;
+            border-radius: 5px;
+            border: 2px solid #d4af37;
+        }
+
+        /* Typography - mobile optimized */
+        .greeting {
+            font-size: 16px;
+            color: #1a1a1a;
+            margin-bottom: 18px;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .message {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #2a2a2a;
+        }
+
+        /* Event details box - mobile responsive */
+        .event-details {
+            background-color: #fffef0;
+            padding: 15px;
+            border-left: 4px solid #d4af37;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .event-details h3 {
+            color: #1a1a1a;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            line-height: 1.3;
+        }
+
+        .detail-item {
+            margin: 8px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #2a2a2a;
+            display: inline-block;
+            min-width: 60px;
+        }
+
+        .detail-label-dress {
+            font-weight: bold;
+            color: white;
+        }
+
+        .detail-label-note {
+            font-style: italic;            
+            color: #2a2a2a;
+            display: inline-block;
+            min-width: 60px;
+            font-weight: lighter;
+        }
+
+        /* Dress code section - mobile optimized */
+        .dress-code {
+            background-color: #1a1a1a;
+            color: #d4af37;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #d4af37;
+        }
+
+        .dress-code .detail-item {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Footer - mobile responsive */
+        .footer {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .signature {
+            font-size: 15px;
+            color: #d4af37;
+            font-weight: bold;
+            line-height: 1.4;
+            margin: 2px 0;
+        }
+
+        .planner-info {
+            font-size: 13px;
+            color: #ffd700;
+            font-style: italic;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        /* Mobile-specific optimizations */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                border-left: none !important;
+                border-right: none !important;
+            }
+
+            .header-section {
+                padding: 15px 10px !important;
+            }
+
+            .main-title {
+                font-size: 22px !important;
+                letter-spacing: 1px !important;
+            }
+
+            .celebration-title {
+                font-size: 16px !important;
+            }
+
+            .main-content {
+                padding: 15px !important;
+            }
+
+            .hero-image {
+                max-width: 100% !important;
+                width: 100% !important;
+                height: auto !important;
+                margin: 5px auto 15px auto !important;
+            }
+
+            .greeting {
+                font-size: 15px !important;
+                margin-bottom: 15px !important;
+            }
+
+            .message {
+                font-size: 14px !important;
+                margin-bottom: 18px !important;
+            }
+
+            .event-details {
+                padding: 12px !important;
+                margin: 15px 0 !important;
+            }
+
+            .event-details h3 {
+                font-size: 15px !important;
+                margin-bottom: 12px !important;
+            }
+
+            .detail-item {
+                font-size: 13px !important;
+                margin: 6px 0 !important;
+            }
+
+            .detail-label {
+                min-width: 50px !important;
+            }
+
+            .dress-code {
+                padding: 12px !important;
+                margin: 15px 0 !important;
+            }
+
+            .dress-code .detail-item {
+                font-size: 13px !important;
+            }
+
+            .footer {
+                padding: 15px 10px !important;
+            }
+
+            .signature {
+                font-size: 14px !important;
+            }
+
+            .planner-info {
+                font-size: 12px !important;
+            }
+        }
+
+        /* Ultra-small screens (phones in portrait) */
+        @media only screen and (max-width: 480px) {
+            .main-title {
+                font-size: 20px !important;
+            }
+
+            .celebration-title {
+                font-size: 15px !important;
+            }
+
+            .greeting {
+                font-size: 14px !important;
+            }
+
+            .message {
+                font-size: 13px !important;
+            }
+
+            .event-details h3 {
+                font-size: 14px !important;
+            }
+
+            .detail-item {
+                font-size: 12px !important;
+            }
+
+            .dress-code .detail-item {
+                font-size: 12px !important;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .email-container {
+                border-color: #d4af37 !important;
+            }
+        }
+
+        /* High DPI displays */
+        @media only screen and (-webkit-min-device-pixel-ratio: 2),
+               only screen and (min-resolution: 192dpi) {
+            .hero-image {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: optimize-contrast;
+            }
+        }
+
+        /* Accessibility improvements */
+        .detail-label,
+        .detail-label-dress {
+            speak: literal-punctuation;
+        }
+
+        /* Prevent text selection issues on mobile */
+        .main-title,
+        .celebration-title,
+        .signature {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h2 class="celebration-title">Celebrating CHIAKA BEN-OBI @60</h2>
+        </div>
+
+        <!-- Main Content Table -->
+        <table class="content-table" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td class="main-content">
+                    <!-- Hero Image - Mobile Responsive -->
+
+                    <div class="greeting">
+                        Dear family, Friends and Colleagues of Chiaka Ben-Obi
+                    </div>
+
+                    <div class="message">
+                        With a heart full of gratitude and joy, we are delighted to invite you to celebrate a very special milestone, Chiaka's 60th birthday.
+                        Kindly click on the link below to view your invitation card, RSVP, Download the Invite, Save to Calendar, and Gift the Celebrant.
+                    </div>
+
+                    <!-- Event Details Box -->
+                    <div class="event-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Invitation Card Link: </span> {{rsvpLink}}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label-note">Please note that RSVP is to confirm your attendance and must be received by October 30th, 2025, at the latest, to assist our planning, especially with seat availability, to let us know you will be there.</span> 
+                        </div>
+                    </div>
+
+                    <div class="message">
+                        This is strictly an invited guests only event, so we humbly ask that you don't share the link. However, you can RSVP with up to two guests.                    </div>
+
+                    <div class="message">
+                        Should you need more information about this event, kindly send us a message using the contact information below.
+                    </div>
+
+                    <!-- Event Details Box -->
+                    <div class="event-details">
+                        <h3>Contact Information</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Tel.(SMS& WhatsApp):</span> +234 916 191 3705
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span> chiakais60@gmail.com
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="signature">Warmly,</div>
+            <div class="signature">Event Lord,</div>
+            <div class="planner-info">Event Planner - Chiaka@60</div>
+        </div>
+    </div>
+</body>
+
+</html>
