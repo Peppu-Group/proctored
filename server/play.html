@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vessel Management Report</title>
+  <style>
+    :root {
+      --primary: #349940;
+      --primary-dark: #0f5e04;
+      --secondary: #F4B400;
+      --accent: #349940;
+      --light: #f6fcf5;
+      --dark: #1d3244;
+      --gray: #758796;
+      --success: #27ae60;
+      --warning: #f39c12;
+      --danger: #ee7669;
+      --maitprimary: #1a5276;
+      --maitsecondary: #2e86c1;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .email-container {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .email-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .vessel-number {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0;
+      letter-spacing: 2px;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      margin-top: 8px;
+      opacity: 0.9;
+    }
+
+    .email-body {
+      padding: 30px;
+    }
+
+    .greeting {
+      font-size: 16px;
+      color: var(--dark);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: bold;
+      margin: 25px 0 15px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .vessel-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background-color: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .vessel-table thead {
+      background: linear-gradient(135deg, var(--maitprimary) 0%, var(--maitsecondary) 100%);
+      color: white;
+    }
+
+    .vessel-table th {
+      padding: 14px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .vessel-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #e0e0e0;
+      color: var(--dark);
+      font-size: 14px;
+    }
+
+    .vessel-table tbody tr:hover {
+      background-color: var(--light);
+    }
+
+    .vessel-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-operational {
+      background-color: #d4edda;
+      color: var(--success);
+    }
+
+    .status-maintenance {
+      background-color: #fff3cd;
+      color: var(--warning);
+    }
+
+    .status-critical {
+      background-color: #f8d7da;
+      color: var(--danger);
+    }
+
+    .status-inactive {
+      background-color: #e2e3e5;
+      color: var(--gray);
+    }
+
+    .summary-box {
+      background-color: var(--light);
+      border-left: 4px solid var(--primary);
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    .summary-box p {
+      margin: 8px 0;
+      color: var(--dark);
+      font-size: 14px;
+    }
+
+    .summary-box strong {
+      color: var(--primary-dark);
+    }
+
+    .email-footer {
+      background-color: #f8f9fa;
+      padding: 20px 30px;
+      text-align: center;
+      color: var(--gray);
+      font-size: 13px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .footer-text {
+      margin: 5px 0;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: 600;
+      margin: 15px 0;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .number-highlight {
+      font-weight: bold;
+      color: var(--maitprimary);
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="email-header">
+      <h1 class="vessel-number">{{company_name}}</h1>
+      <p class="header-subtitle">Fleet Management Report - {{date}}</p>
+    </div>
+
+    <!-- Body -->
+    <div class="email-body">
+      <div class="greeting">
+        <p>Dear Fleet Manager,</p>
+        <p>Please find below the comprehensive status report for our vessel fleet. This report includes current maintenance status, crew assignments, inventory levels, and pending requisitions.</p>
+      </div>
+
+      <h2 class="section-title">Vessel Overview</h2>
+
+      <table class="vessel-table">
+        <thead>
+          <tr>
+            <th>Vessel Name</th>
+            <th>Status</th>
+            <th>Total Crew</th>
+            <th>Inventory</th>
+            <th>Requisitions</th>
+            <th>Next Maintenance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>MV Ocean Pioneer</strong></td>
+            <td><span class="status-badge status-operational">Operational</span></td>
+            <td class="number-highlight">24</td>
+            <td class="number-highlight">92%</td>
+            <td class="number-highlight">3 Pending</td>
+            <td>Dec 15, 2025</td>
+          </tr>
+          <tr>
+            <td><strong>MV Sea Guardian</strong></td>
+            <td><span class="status-badge status-maintenance">Maintenance</span></td>
+            <td class="number-highlight">18</td>
+            <td class="number-highlight">78%</td>
+            <td class="number-highlight">7 Pending</td>
+            <td>In Progress</td>
+          </tr>
+          <tr>
+            <td><strong>MV Horizon Star</strong></td>
+            <td><span class="status-badge status-operational">Operational</span></td>
+            <td class="number-highlight">26</td>
+            <td class="number-highlight">88%</td>
+            <td class="number-highlight">2 Pending</td>
+            <td>Jan 10, 2026</td>
+          </tr>
+          <tr>
+            <td><strong>MV Atlantic Voyager</strong></td>
+            <td><span class="status-badge status-critical">Critical</span></td>
+            <td class="number-highlight">15</td>
+            <td class="number-highlight">45%</td>
+            <td class="number-highlight">12 Pending</td>
+            <td>Urgent</td>
+          </tr>
+          <tr>
+            <td><strong>MV Pacific Explorer</strong></td>
+            <td><span class="status-badge status-operational">Operational</span></td>
+            <td class="number-highlight">22</td>
+            <td class="number-highlight">95%</td>
+            <td class="number-highlight">1 Pending</td>
+            <td>Dec 28, 2025</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="summary-box">
+        <p><strong>Fleet Summary:</strong></p>
+        <p>• Total Vessels: <strong>5</strong></p>
+        <p>• Operational: <strong>3</strong> | Under Maintenance: <strong>1</strong> | Critical: <strong>1</strong></p>
+        <p>• Total Crew Members: <strong>105</strong></p>
+        <p>• Average Inventory Level: <strong>79.6%</strong></p>
+        <p>• Total Pending Requisitions: <strong>25</strong></p>
+      </div>
+
+      <h2 class="section-title">Action Required</h2>
+      <div class="summary-box">
+        <p>⚠️ <strong>MV Atlantic Voyager</strong> requires immediate attention due to critical status and low inventory levels.</p>
+        <p>📋 Review and approve pending requisitions to maintain operational efficiency.</p>
+        <p>🔧 Schedule maintenance for vessels approaching service dates.</p>
+      </div>
+
+      <center>
+        <a href="#" class="btn">View Full Report</a>
+      </center>
+    </div>
+
+    <!-- Footer -->
+    <div class="email-footer">
+      <p class="footer-text"><strong>Maritime Fleet Management System</strong></p>
+      <p class="footer-text">This is an automated report generated on November 27, 2025</p>
+      <p class="footer-text">For questions or concerns, contact: fleet.management@company.com</p>
+    </div>
+  </div>
+</body>
+</html>

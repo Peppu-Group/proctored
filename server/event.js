@@ -1467,7 +1467,7 @@ app.get('/chiaka-mail-single', async (req, res) => {
     });
 });
 */
-/*
+
 const token = process.env.WHATSAPP_TOKEN; // your permanent access token
 const phoneNumberId = process.env.PHONE_NUMBER_ID; // your verified number ID
 
@@ -1530,7 +1530,7 @@ async function sendWhatsAppMessage(recipient) {
                 to: formattedPhone,
                 type: "template",
                 template: {
-                    name: 'auto_pay_reminder_2',  // Your approved template name
+                    name: 'chiaka_new_appreciation',  // Your approved template name
                     language: { code: 'en_US' },
                     components: [
                         {
@@ -1538,12 +1538,20 @@ async function sendWhatsAppMessage(recipient) {
                             parameters: [
                                 {
                                     type: "text",
-                                    text: name  // First variant: name from CSV
+                                    text: `Chiaka's 60th Birthday`  // First variant: name from CSV
                                 },
                                 {
                                     type: "text",
-                                    text: `https://chiaka-at-60.com/invite/${id}`  // First variant: name from CSV
-                                }
+                                    text: `Celebrating me`  // First variant: name from CSV
+                                },
+                                {
+                                    type: "text",
+                                    text: `Future events`  // First variant: name from CSV
+                                },
+                                {
+                                    type: "text",
+                                    text: `my`  // First variant: name from CSV
+                                },
                             ]
                         }
                     ]
@@ -1725,7 +1733,6 @@ async function main() {
 }
 
 main();
-*/
 /*
 // Save the date for EBUBEDIKE
 const token = process.env.WHATSAPP_TOKEN; // your permanent access token

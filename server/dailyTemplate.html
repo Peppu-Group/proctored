@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Vessel Management Report</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    /* Reset */
+    body,
+    table,
+    td,
+    p,
+    a,
+    li,
+    blockquote {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+
+    table,
+    td {
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+
+    img {
+      -ms-interpolation-mode: bicubic;
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+    }
+
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e2e8f0;
+    }
+
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #e2e8f0;
+      padding: 40px 0;
+    }
+
+    .main-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header Styles */
+    .header-table {
+      background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0891b2 100%);
+    }
+
+    .header-content {
+      padding: 48px 32px;
+      text-align: center;
+    }
+
+    .company-name {
+      font-size: 32px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .report-title {
+      font-size: 14px;
+      color: #bae6fd;
+      margin: 12px 0 0 0;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 600;
+    }
+
+    .report-date {
+      font-size: 13px;
+      color: #7dd3fc;
+      margin: 8px 0 0 0;
+    }
+
+    /* Divider */
+    .divider {
+      height: 4px;
+      background: linear-gradient(90deg, #f59e0b 0%, #eab308 50%, #84cc16 100%);
+    }
+
+    /* Body Content */
+    .body-content {
+      padding: 32px;
+    }
+
+    /* Greeting */
+    .greeting {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .greeting strong {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-table {
+      width: 100%;
+      margin: 24px 0;
+    }
+
+    .dashboard-cell {
+      padding: 4px;
+    }
+
+    .stat-card {
+      border-radius: 8px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    .stat-card.vessels {
+      background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+    }
+
+    .stat-card.crew {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    }
+
+    .stat-card.requisitions {
+      background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+    }
+
+    .stat-card.inventory {
+      background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.85);
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 6px 0 0 0;
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 32px 0 16px 0;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #0891b2;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Vessel Card */
+    .vessel-card {
+      margin-bottom: 24px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+
+    .vessel-header {
+      padding: 20px 24px;
+      color: #ffffff;
+    }
+
+    .vessel-header.operational {
+      background: linear-gradient(135deg, #0e7490 0%, #22d3ee 100%);
+    }
+
+    .vessel-header.maintenance {
+      background: linear-gradient(135deg, #b91c1c 0%, #f87171 100%);
+    }
+
+    .vessel-header.critical {
+      background: linear-gradient(135deg, #b45309 0%, #fbbf24 100%);
+    }
+
+    .vessel-header.docked {
+      background: linear-gradient(135deg, #047857 0%, #34d399 100%);
+    }
+
+    .vessel-name {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+      color: #ffffff;
+    }
+
+    .status-badge {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 8px;
+    }
+
+    /* Data Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: top;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table .category-header {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .data-table .category-icon {
+      font-size: 14px;
+      margin-right: 6px;
+    }
+
+    /* Category Colors */
+    .cat-maintenance {
+      border-left: 4px solid #0891b2;
+    }
+
+    .cat-crew {
+      border-left: 4px solid #2563eb;
+    }
+
+    .cat-voyage {
+      border-left: 4px solid #059669;
+    }
+
+    .cat-requisitions {
+      border-left: 4px solid #dc2626;
+    }
+
+    .cat-certifications {
+      border-left: 4px solid #7c3aed;
+    }
+
+    .cat-inventory {
+      border-left: 4px solid #f59e0b;
+    }
+
+    /* Value Colors */
+    .value-cyan {
+      color: #0891b2;
+      font-weight: 600;
+    }
+
+    .value-blue {
+      color: #2563eb;
+      font-weight: 600;
+    }
+
+    .value-green {
+      color: #059669;
+      font-weight: 600;
+    }
+
+    .value-red {
+      color: #dc2626;
+      font-weight: 600;
+    }
+
+    .value-orange {
+      color: #d97706;
+      font-weight: 600;
+    }
+
+    .value-gray {
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #0f172a;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .footer-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: #94a3b8;
+      margin: 4px 0;
+      line-height: 1.6;
+    }
+
+    .footer-divider {
+      height: 1px;
+      background-color: #334155;
+      margin: 16px auto;
+      width: 80px;
+    }
+
+    /* Responsive Styles */
+    @media screen and (max-width: 600px) {
+      .wrapper {
+        padding: 16px 8px !important;
+      }
+
+      .main-container {
+        border-radius: 0 !important;
+      }
+
+      .header-content {
+        padding: 32px 20px !important;
+      }
+
+      .company-name {
+        font-size: 24px !important;
+      }
+
+      .body-content {
+        padding: 20px !important;
+      }
+
+      .dashboard-table,
+      .dashboard-table tbody,
+      .dashboard-table tr,
+      .dashboard-table td {
+        display: block !important;
+        width: 100% !important;
+      }
+
+      .dashboard-cell {
+        padding: 4px 0 !important;
+      }
+
+      .stat-card {
+        padding: 16px !important;
+      }
+
+      .stat-value {
+        font-size: 24px !important;
+      }
+
+      .vessel-header {
+        padding: 16px 20px !important;
+      }
+
+      .vessel-name {
+        font-size: 16px !important;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+      }
+
+      .section-title {
+        font-size: 16px !important;
+      }
+
+      .footer {
+        padding: 24px 20px !important;
+      }
+    }
+    .section-title-action {
+      color: #dc2626;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 25px 0 15px 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #dc2626;
+    }
+    .summary-box {
+      background-color: #f6fcf5;
+      border-left: 4px solid #dc2626;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <table role="presentation" class="main-container" cellpadding="0" cellspacing="0" width="700" align="center">
+
+      <!-- Header -->
+      <tr>
+        <td>
+          <table role="presentation" class="header-table" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td class="header-content">
+                <h1 class="company-name">{{company_name}}</h1>
+                <p class="report-title">Fleet Management Report</p>
+                <p class="report-date">Report Date: {{date}}</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Accent Divider -->
+      <tr>
+        <td class="divider"></td>
+      </tr>
+
+      <!-- Body Content -->
+      <tr>
+        <td class="body-content">
+
+          <!-- Greeting -->
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td class="greeting">
+                <p><strong>Dear Fleet Manager,</strong></p>
+                <p style="margin-top: 12px;">Please find below the comprehensive status report for our vessel fleet with
+                  detailed information on maintenance, crew, voyages, requisitions, certifications, and inventory.</p>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Executive Summary Dashboard -->
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 8px;">
+            <tr>
+              <td>
+                <p
+                  style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 12px 0; font-weight: 600;">
+                  Executive Summary</p>
+              </td>
+            </tr>
+          </table>
+
+          <table role="presentation" class="dashboard-table" cellpadding="0" cellspacing="0">
+            <tr>
+              <td class="dashboard-cell" width="25%">
+                <table role="presentation" class="stat-card vessels" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="text-align: center; padding: 20px 8px;">
+                      <p class="stat-label">Total Vessels</p>
+                      <p class="stat-value">{{total_vessels}}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td class="dashboard-cell" width="25%">
+                <table role="presentation" class="stat-card crew" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="text-align: center; padding: 20px 8px;">
+                      <p class="stat-label">Total Crew</p>
+                      <p class="stat-value">{{total_crew}}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td class="dashboard-cell" width="25%">
+                <table role="presentation" class="stat-card requisitions" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="text-align: center; padding: 20px 8px;">
+                      <p class="stat-label">Requisitions</p>
+                      <p class="stat-value">{{total_requisitions}}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td class="dashboard-cell" width="25%">
+                <table role="presentation" class="stat-card inventory" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="text-align: center; padding: 20px 8px;">
+                      <p class="stat-label">Total Inventory</p>
+                      <p class="stat-value">{{avg_inventory}}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Section Title -->
+          <h2 class="section-title">📋 Detailed Vessel Report</h2>
+
+          <!-- VESSELS LOOP -->
+          {{#vessels}}
+          <table role="presentation" class="vessel-card" cellpadding="0" cellspacing="0" width="100%">
+            <!-- Vessel Header -->
+            <tr>
+              <td class="vessel-header {{status_class}}">
+                <h3 class="vessel-name">⚓ {{vessel_name}}</h3>
+                <span class="status-badge">{{status}}</span>
+              </td>
+            </tr>
+
+            <!-- Vessel Data Table -->
+            <tr>
+              <td>
+                <table class="data-table" cellpadding="0" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th width="30%">Category</th>
+                      <th width="35%">Metric</th>
+                      <th width="35%">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Maintenance Section -->
+                    <tr class="category-header cat-maintenance">
+                      <td colspan="3"><span class="category-icon">🔧</span> Maintenance</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Next Scheduled</td>
+                      <td class="{{next_maintenance_color}}">{{next_maintenance}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Total Maintenance Records</td>
+                      <td class="{{total_maintenance_color}}">{{total_maintenance}}</td>
+                    </tr>
+
+                    <!-- Crew Section -->
+                    <tr class="category-header cat-crew">
+                      <td colspan="3"><span class="category-icon">👥</span> Crew Management</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Total Crew Members</td>
+                      <td class="value-blue">{{total_crew_members}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Currently Engaged</td>
+                      <td class="value-blue">{{crew_engaged}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Available Personnel</td>
+                      <td class="value-blue">{{crew_available}}</td>
+                    </tr>
+
+                    <!-- Voyage Section -->
+                    <tr class="category-header cat-voyage">
+                      <td colspan="3"><span class="category-icon">🌊</span> Voyage Information</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Current Status</td>
+                      <td class="{{voyage_status_color}}">{{voyage_status}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>{{voyage_location_label}}</td>
+                      <td class="value-green">{{voyage_location}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>{{voyage_time_label}}</td>
+                      <td class="value-green">{{voyage_time}}</td>
+                    </tr>
+
+                    <!-- Requisitions Section -->
+                    <tr class="category-header cat-requisitions">
+                      <td colspan="3"><span class="category-icon">📋</span> Requisitions</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Total Requisitions</td>
+                      <td class="value-red">{{total_requisitions}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Priority Items</td>
+                      <td class="value-red">{{priority_items}}</td>
+                    </tr>
+
+                    <!-- Certifications Section -->
+                    <tr class="category-header cat-certifications">
+                      <td colspan="3"><span class="category-icon">📜</span> Certifications</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Expired Certificates</td>
+                      <td class="value-red">{{cert_expired}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Expiring Soon</td>
+                      <td class="value-orange">You will get a daily reminder 1 week until
+                        the expiration of all certificates</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Valid Certificates</td>
+                      <td class="value-green">{{cert_valid}}</td>
+                    </tr>
+                    <!-- Inventory Section -->
+                    <tr class="category-header cat-inventory">
+                      <td colspan="3"><span class="category-icon">📦</span> Inventory Status</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Current Inventory Level</td>
+                      <td class="{{inventory_level_color}}">{{inventory_level}}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>Low Stock Items</td>
+                      <td class="{{low_stock_color}}">{{low_stock_items}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </table>
+          {{/vessels}}
+
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+        <h2 class="section-title-action">Action Required</h2>
+        <div class="summary-box">
+          <p>{{required}}</p>
+        </div>
+      </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td class="footer">
+          <p class="footer-title">OceanHelm Maritime Fleet Management System</p>
+          <div class="footer-divider"></div>
+          <p class="footer-text">This is an automated report generated on {{generation_date}}</p>
+          <p class="footer-text">For questions or concerns, contact: marine@peppubuild.com</p>
+        </td>
+      </tr>
+
+    </table>
+  </div>
+</body>
+
+</html>
