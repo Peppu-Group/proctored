@@ -1114,7 +1114,7 @@ async function getCertReminderTemplate(vesselName, certName, date, certType) {
     }
 }
 
-async function getMaintenanceTemplate(vessel, component, assigned_to) {
+async function getMaintenanceTemplate(vessel, component, assigned_to, next_due) {
     try {
         const filePath = path.join(__dirname, 'certReminderTemplate.html');
         let template = await fs.readFile(filePath, 'utf-8');
@@ -1122,7 +1122,8 @@ async function getMaintenanceTemplate(vessel, component, assigned_to) {
         // Replace placeholders with actual data
         template = template.replace('{{certName}}', `${component}, Assigned To: ${assigned_to}`);
         template = template.replace('{{vesselName}}', vessel);
-        template = template.replace('{{deadLine}}', '1 Day');
+        template = template.replace('{{deadLine}}', next_due);
+        template = template.replace('{{certType}}', 'Maintenance');
 
         return template;
     } catch (error) {
@@ -1315,32 +1316,60 @@ async function getItemsExpiringTomorrow() {
     try {
         const { data, error: supabaseError } = await supabase
             .from('tasks')
-            .select('component, vessel, assigned_to, email, next_due')
-            .lte('next_due', sevenDaysFromNow.toISOString().split('T')[0]) // due within 7 days or already past
-            .is('replaced', null); // only get items that haven't been replaced
+            .select('component, vessel, assigned_to, email, next_due, company_id')
+            .lte('next_due', sevenDaysFromNow.toISOString().split('T')[0]);
 
         if (supabaseError) {
             console.error('Error fetching expiring items:', supabaseError);
             return [];
         }
 
-        // Filter to only include items that are:
-        // 1. Due within the next 7 days, OR
-        // 2. Already past due (expired)
+        // Filter to only include items that are due within 7 days or already past due
         const filteredData = (data ?? []).filter(item => {
             const dueDate = new Date(item.next_due);
             const daysDifference = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-            return daysDifference <= 7; // includes negative numbers (expired items)
+            return daysDifference <= 7;
         });
 
-        return filteredData;
+        // Enrich with company email if task email is empty
+        const enrichedData = await Promise.all(
+            filteredData.map(async (item) => {
+                // If email already exists, return as is
+                if (item.email) {
+                    return item;
+                }
+
+                // Fetch company email
+                const { data: companyData } = await supabase
+                    .from('companies')
+                    .select('email, email_access')
+                    .eq('id', item.company_id)
+                    .single();
+
+                // Determine email: priority order
+                let email;
+                if (companyData?.email_access?.maintenance) {
+                    email = companyData.email_access.maintenance;
+                } else if (companyData?.email) {
+                    email = companyData.email;
+                } else {
+                    email = 'ukpaiugochiibem@gmail.com';
+                }
+
+                return {
+                    ...item,
+                    email
+                };
+            })
+        );
+
+        return enrichedData;
 
     } catch (err) {
         console.error('Database query failed:', err);
         return [];
     }
 }
-
 
 app.post('/maintenance/reminder', (req, res) => {
     getItemsExpiringTomorrow().then((resp) => {
@@ -1353,7 +1382,7 @@ app.post('/maintenance/reminder', (req, res) => {
     res.status(200).json({ message: 'Email sent successfully' });
 });
 
-app.get('/certification/reminder', (req, res) => {
+app.post('/certification/reminder', (req, res) => {
     getItemsExpiringWeek().then((resp) => {
         for (const data of resp) {
             if (!data.email) continue;
@@ -1397,6 +1426,53 @@ async function sendNotificationMails(notificationData) {
     }
 }
 
+async function sendNotificationUpdates(notificationData) {
+    try {
+        const mailOptions = {
+            from: '"Update from OceanHelm" <users@peppubuild.com>',
+            to: notificationData.email,
+            subject: 'You have an update about your request',
+            html: notificationData.text
+        };
+
+        return await transporter.sendMail(mailOptions);
+
+    } catch (error) {
+        console.error('Error in sendNotificationUpdates:', error);
+        throw error;
+    }
+}
+
+app.post('/notifications/update', async (req, res) => {
+    try {
+        const { email, text } = req.body;
+
+        // Basic validation
+        if (!email || !text) {
+            return res.status(400).json({
+                success: false,
+                message: 'email and text are required'
+            });
+        }
+
+        await sendNotificationUpdates({
+            email,
+            text
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Notification email sent successfully'
+        });
+
+    } catch (error) {
+        console.error('Notification update error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to send notification update'
+        });
+    }
+});
 
 app.post('/notification', (req, res) => {
     const notificationData = req.body;
@@ -1537,7 +1613,8 @@ async function sendMaintenanceMails(data) {
         const htmlContent = await getMaintenanceTemplate(
             data.vessel,
             data.component,
-            data.assigned_to // fixed variable
+            data.assigned_to,
+            data.next_due
         );
 
         const mailOptions = {
@@ -2183,4 +2260,4 @@ module.exports = {
 // // Send to all companies with email addresses configured
 // sendFleetManagementEmailToAllCompanies(supabase, transporter);
 
-app.listen(3001, () => console.log('Server running on port 3000'));
+app.listen(3000, () => console.log('Server running on port 3000'));
