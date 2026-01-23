@@ -1096,6 +1096,64 @@ async function getWelcomeTemplate(name) {
     }
 }
 
+async function getUpdateTemplate(message) {
+    try {
+        const filePath = path.join(__dirname, 'updateTemplate.html');
+        let template = await fs.readFile(filePath, 'utf-8');
+
+        // Replace placeholders with actual data
+        template = template.replace('{{message}}', message);
+
+        return template;
+    } catch (error) {
+        console.error('Error reading email template:', error);
+        throw error;
+    }
+}
+
+app.post('/send-welcome', async (req, res) => {
+    try {
+        const htmlContent = await getWelcomeTemplate(req.body.name)
+
+        const mailOptions = {
+            from: '"Proctored by Peppubuild" <contact@peppubuild.com>',
+            to: req.body.email,
+            subject: `Welcome to Proctored by Peppubuild`,
+            html: htmlContent
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                res.send(error);
+            } else {
+                res.send(info.response);
+            }
+        });
+    } catch {
+        console.error('Error reading email template:', error);
+    }
+
+})
+
+async function sendNotificationUpdates(notificationData) {
+    const htmlContent = await getUpdateTemplate(notificationData.text)
+
+    try {
+        const mailOptions = {
+            from: '"Update from OceanHelm" <users@peppubuild.com>',
+            to: notificationData.email,
+            subject: 'You have an update about your request',
+            html: htmlContent
+        };
+
+        return await transporter.sendMail(mailOptions);
+
+    } catch (error) {
+        console.error('Error in sendNotificationUpdates:', error);
+        throw error;
+    }
+}
+
 async function getCertReminderTemplate(vesselName, certName, date, certType) {
     try {
         const filePath = path.join(__dirname, 'certReminderTemplate.html');
@@ -1423,23 +1481,6 @@ async function sendNotificationMails(notificationData) {
         });
     } catch (error) { // Fixed: added error parameter
         console.error('Error in sendNotificationMails:', error);
-    }
-}
-
-async function sendNotificationUpdates(notificationData) {
-    try {
-        const mailOptions = {
-            from: '"Update from OceanHelm" <users@peppubuild.com>',
-            to: notificationData.email,
-            subject: 'You have an update about your request',
-            html: notificationData.text
-        };
-
-        return await transporter.sendMail(mailOptions);
-
-    } catch (error) {
-        console.error('Error in sendNotificationUpdates:', error);
-        throw error;
     }
 }
 
