@@ -2267,6 +2267,80 @@ async function sendFleetManagementEmail(supabase, transporter, companyId = null)
     }
 }
 
+// Initialize Supabase Admin client with service role key
+const supabaseAdmin = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+)
+
+// Middleware to verify the request is from an authenticated user
+async function authenticateUser(req, res, next) {
+    const authHeader = req.headers.authorization
+    
+    if (!authHeader) {
+        return res.status(401).json({ error: 'No authorization header' })
+    }
+
+    const token = authHeader.replace('Bearer ', '')
+    
+    // Verify the user's JWT token
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token)
+    
+    if (error || !user) {
+        return res.status(401).json({ error: 'Invalid token' })
+    }
+    
+    req.user = user
+    next()
+}
+
+// Invite crew member endpoint
+app.post('/api/invite-crew', authenticateUser, async (req, res) => {
+    try {
+        const { email, fullName, company_id, vessel } = req.body
+
+        // Validate required fields
+        if (!email || !fullName || !company_id) {
+            return res.status(400).json({ 
+                error: 'Missing required fields: email, fullName, company_id' 
+            })
+        }
+
+        // Optional: Verify the requesting user has permission to invite crew
+        // (e.g., check if they're an admin or belong to the same company)
+        
+        // Invite the user
+        const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+            redirectTo: process.env.APP_URL,
+            data: {
+                fullName: fullName,
+                email: email,
+                company_id: company_id,
+                role: 'crew',
+                vessel: vessel || null
+            }
+        })
+
+        if (error) {
+            console.error('Error inviting user:', error)
+            return res.status(400).json({ error: error.message })
+        }
+
+        console.log('Invitation sent successfully:', data)
+        
+        res.status(200).json({ 
+            success: true, 
+            message: 'Invitation sent successfully',
+            data: data
+        })
+
+    } catch (err) {
+        console.error('Server error:', err)
+        res.status(500).json({ error: 'Internal server error' })
+    }
+})
+
+
 // Export functions
 module.exports = {
     getFleetManagementTemplate,
