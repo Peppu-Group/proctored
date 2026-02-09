@@ -54,117 +54,117 @@ const statusDB = path.join(process.cwd(), "status.json");
 
 // ✅ Utility: Append log message to file
 async function logToFile(message) {
-  const timestamp = new Date().toISOString();
-  const logLine = `[${timestamp}] ${message}\n`;
+    const timestamp = new Date().toISOString();
+    const logLine = `[${timestamp}] ${message}\n`;
 
-  try {
-    await fs.appendFile(logFile, logLine);
-  } catch (err) {
-    console.error("Error writing log:", err);
-  }
+    try {
+        await fs.appendFile(logFile, logLine);
+    } catch (err) {
+        console.error("Error writing log:", err);
+    }
 }
 
 // ✅ GET route to return log content
 app.get("/logs", async (req, res) => {
-  try {
-    const content = await fs.readFile(logFile, "utf-8");
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.status(200).send(content);
-  } catch (err) {
-    console.error("Error reading log file:", err);
-    res.status(500).send("Error reading log file");
-  }
+    try {
+        const content = await fs.readFile(logFile, "utf-8");
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        res.status(200).send(content);
+    } catch (err) {
+        console.error("Error reading log file:", err);
+        res.status(500).send("Error reading log file");
+    }
 });
 
 // ✅ 1. VERIFY WEBHOOK (GET)
 app.get("/webhook", async (req, res) => {
-  const mode = req.query["hub.mode"];
-  const token = req.query["hub.verify_token"];
-  const challenge = req.query["hub.challenge"];
+    const mode = req.query["hub.mode"];
+    const token = req.query["hub.verify_token"];
+    const challenge = req.query["hub.challenge"];
 
-  if (mode && token) {
-    if (mode === "subscribe" && token === VERIFY_TOKEN) {
-      await logToFile("✅ Webhook verified successfully!");
-      res.status(200).send(challenge);
+    if (mode && token) {
+        if (mode === "subscribe" && token === VERIFY_TOKEN) {
+            await logToFile("✅ Webhook verified successfully!");
+            res.status(200).send(challenge);
+        } else {
+            await logToFile("❌ Webhook verification failed: invalid token");
+            res.sendStatus(403);
+        }
     } else {
-      await logToFile("❌ Webhook verification failed: invalid token");
-      res.sendStatus(403);
+        await logToFile("⚠️ Webhook verification failed: missing parameters");
+        res.sendStatus(400);
     }
-  } else {
-    await logToFile("⚠️ Webhook verification failed: missing parameters");
-    res.sendStatus(400);
-  }
 });
 
 // ✅ 2. HANDLE MESSAGES AND STATUS UPDATES (POST)
 app.post("/webhook", async (req, res) => {
-  const body = req.body;
+    const body = req.body;
 
-  if (body.object) {
-    for (const entry of body.entry) {
-      for (const change of entry.changes) {
-        const value = change.value;
+    if (body.object) {
+        for (const entry of body.entry) {
+            for (const change of entry.changes) {
+                const value = change.value;
 
-        // 📩 Handle status updates (sent, delivered, read, failed)
-        if (value.statuses) {
-          const status = value.statuses[0];
-          const logLine = `📩 Message ${status.id} to ${status.recipient_id} is now ${status.status}`;
-          await logToFile(logLine);
+                // 📩 Handle status updates (sent, delivered, read, failed)
+                if (value.statuses) {
+                    const status = value.statuses[0];
+                    const logLine = `📩 Message ${status.id} to ${status.recipient_id} is now ${status.status}`;
+                    await logToFile(logLine);
 
-          try {
-            let db = {};
-            try {
-              const existing = await fs.readFile(statusDB, "utf8");
-              db = JSON.parse(existing);
-            } catch (err) {
-              // Ignore if file doesn't exist yet
+                    try {
+                        let db = {};
+                        try {
+                            const existing = await fs.readFile(statusDB, "utf8");
+                            db = JSON.parse(existing);
+                        } catch (err) {
+                            // Ignore if file doesn't exist yet
+                        }
+
+                        db[status.id] = {
+                            status: status.status,
+                            recipient: status.recipient_id,
+                            timestamp: status.timestamp,
+                        };
+
+                        await fs.writeFile(statusDB, JSON.stringify(db, null, 2));
+                    } catch (err) {
+                        console.error("Error updating status DB:", err);
+                    }
+                }
+
+                // 💬 Handle incoming messages
+                if (value.messages) {
+                    const message = value.messages[0];
+                    await logToFile(
+                        `💬 New message from ${message.from}: ${message.text?.body || "(no text)"}`
+                    );
+                }
             }
-
-            db[status.id] = {
-              status: status.status,
-              recipient: status.recipient_id,
-              timestamp: status.timestamp,
-            };
-
-            await fs.writeFile(statusDB, JSON.stringify(db, null, 2));
-          } catch (err) {
-            console.error("Error updating status DB:", err);
-          }
         }
 
-        // 💬 Handle incoming messages
-        if (value.messages) {
-          const message = value.messages[0];
-          await logToFile(
-            `💬 New message from ${message.from}: ${message.text?.body || "(no text)"}`
-          );
-        }
-      }
+        res.sendStatus(200);
+    } else {
+        await logToFile("⚠️ Webhook received request with no body.object");
+        res.sendStatus(404);
     }
-
-    res.sendStatus(200);
-  } else {
-    await logToFile("⚠️ Webhook received request with no body.object");
-    res.sendStatus(404);
-  }
 });
 
 // ✅ 3. CHECK MESSAGE STATUS (GET)
 app.get("/status/:id", async (req, res) => {
-  const id = req.params.id;
+    const id = req.params.id;
 
-  try {
-    const data = await fs.readFile(statusDB, "utf8");
-    const db = JSON.parse(data);
-    res.json({
-      id,
-      status: db[id]?.status || "unknown",
-      recipient: db[id]?.recipient || null,
-      timestamp: db[id]?.timestamp || null,
-    });
-  } catch (err) {
-    res.json({ id, status: "unknown" });
-  }
+    try {
+        const data = await fs.readFile(statusDB, "utf8");
+        const db = JSON.parse(data);
+        res.json({
+            id,
+            status: db[id]?.status || "unknown",
+            recipient: db[id]?.recipient || null,
+            timestamp: db[id]?.timestamp || null,
+        });
+    } catch (err) {
+        res.json({ id, status: "unknown" });
+    }
 });
 
 app.post('/promptai', async (req, res) => {
@@ -1368,7 +1368,7 @@ async function getItemsExpiringTomorrow() {
     const today = new Date();
     const sevenDaysFromNow = new Date();
     sevenDaysFromNow.setDate(today.getDate() + 7);
-    
+
     const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
 
     try {
@@ -1526,18 +1526,18 @@ app.post('/notification', (req, res) => {
 async function sendReminderMails(dataArray) {
     const CONCURRENCY = 5; // Send 5 emails at a time
     const DELAY_MS = 1000; // 1 second delay between batches
-    
+
     // Handle single object or array
     const emailList = Array.isArray(dataArray) ? dataArray : [dataArray];
     const results = [];
-    
+
     // Helper function to send a single email
     async function sendSingleEmail(data) {
         try {
             const htmlContent = await getCertReminderTemplate(
-                data.vesselName, 
-                data.certName, 
-                data.date, 
+                data.vesselName,
+                data.certName,
+                data.date,
                 data.certType
             );
 
@@ -1574,12 +1574,12 @@ async function sendReminderMails(dataArray) {
     // Process emails in batches with concurrency limit
     for (let i = 0; i < emailList.length; i += CONCURRENCY) {
         const batch = emailList.slice(i, i + CONCURRENCY);
-        
+
         // Send batch concurrently
         const batchResults = await Promise.allSettled(
             batch.map(data => sendSingleEmail(data))
         );
-        
+
         // Collect results
         batchResults.forEach(result => {
             if (result.status === 'fulfilled') {
@@ -1591,13 +1591,13 @@ async function sendReminderMails(dataArray) {
                 });
             }
         });
-        
+
         // Add delay between batches (except for last batch)
         if (i + CONCURRENCY < emailList.length) {
             await new Promise(resolve => setTimeout(resolve, DELAY_MS));
         }
     }
-    
+
     // Summary
     const summary = {
         total: results.length,
@@ -1605,7 +1605,7 @@ async function sendReminderMails(dataArray) {
         failed: results.filter(r => !r.success).length,
         results: results
     };
-        
+
     return summary;
 }
 
@@ -2276,20 +2276,20 @@ const supabaseAdmin = createClient(
 // Middleware to verify the request is from an authenticated user
 async function authenticateUser(req, res, next) {
     const authHeader = req.headers.authorization
-    
+
     if (!authHeader) {
         return res.status(401).json({ error: 'No authorization header' })
     }
 
     const token = authHeader.replace('Bearer ', '')
-    
+
     // Verify the user's JWT token
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(token)
-    
+
     if (error || !user) {
         return res.status(401).json({ error: 'Invalid token' })
     }
-    
+
     req.user = user
     next()
 }
@@ -2301,14 +2301,14 @@ app.post('/api/invite-crew', authenticateUser, async (req, res) => {
 
         // Validate required fields
         if (!email || !fullName || !company_id) {
-            return res.status(400).json({ 
-                error: 'Missing required fields: email, fullName, company_id' 
+            return res.status(400).json({
+                error: 'Missing required fields: email, fullName, company_id'
             })
         }
 
         // Optional: Verify the requesting user has permission to invite crew
         // (e.g., check if they're an admin or belong to the same company)
-        
+
         // Invite the user
         const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
             redirectTo: process.env.APP_URL,
@@ -2327,9 +2327,9 @@ app.post('/api/invite-crew', authenticateUser, async (req, res) => {
         }
 
         console.log('Invitation sent successfully:', data)
-        
-        res.status(200).json({ 
-            success: true, 
+
+        res.status(200).json({
+            success: true,
             message: 'Invitation sent successfully',
             data: data
         })
@@ -2339,6 +2339,36 @@ app.post('/api/invite-crew', authenticateUser, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' })
     }
 })
+
+app.delete('/users/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Optional: Add authentication/authorization checks here
+        // to ensure only admins can delete users
+
+        // Delete user from Supabase Auth
+        const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        // Profile deletion might cascade automatically if configured,
+        // otherwise delete it explicitly
+        /*
+        await supabaseAdmin
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
+        */
+
+        res.json({ success: true, message: 'User deleted successfully' });
+    } catch (error) {
+        console.error('Delete user error:', error);
+        res.status(500).json({ error: 'Failed to delete user' });
+    }
+});
 
 
 // Export functions
